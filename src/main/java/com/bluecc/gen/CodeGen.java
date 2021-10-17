@@ -11,6 +11,9 @@ import com.baomidou.mybatisplus.generator.keywords.MySqlKeyWordsHandler;
 
 import java.sql.SQLException;
 
+/**
+ * $ just run gen.CodeGen
+ */
 public class CodeGen {
     public static final DataSourceConfig DATA_SOURCE_CONFIG =
             new DataSourceConfig.Builder("jdbc:mysql://127.0.0.1:3306/bot", "root", "root")
@@ -22,21 +25,27 @@ public class CodeGen {
 
     public static void main(String[] args) throws SQLException {
         new CodeGen().gen();
+        System.out.println("ok.");
     }
 
     public void gen() {
+        AutoGenerator generator = getAutoGenerator();
+
+        generator.execute();
+    }
+
+    public AutoGenerator getAutoGenerator() {
         AutoGenerator generator = new AutoGenerator(DATA_SOURCE_CONFIG);
         generator.strategy(strategyConfig().build());
         generator.global(globalConfig().build());
         generator.packageInfo(packageConfig().build());
-
-        generator.execute();
+        return generator;
     }
 
     /**
      * 策略配置
      */
-    private StrategyConfig.Builder strategyConfig() {
+    StrategyConfig.Builder strategyConfig() {
         return new StrategyConfig.Builder()
                 .addInclude("hotel", "addresses",
                         "restaurant", "users");
@@ -45,9 +54,9 @@ public class CodeGen {
     /**
      * 全局配置
      */
-    private GlobalConfig.Builder globalConfig() {
+    GlobalConfig.Builder globalConfig() {
         return new GlobalConfig.Builder()
-                .fileOverride()
+//                .fileOverride()
                 .enableSwagger()
                 .outputDir("/opt/gen")
                 .author("samlet")
@@ -58,7 +67,7 @@ public class CodeGen {
     /**
      * 包配置
      */
-    private PackageConfig.Builder packageConfig() {
+    PackageConfig.Builder packageConfig() {
         return new PackageConfig.Builder()
                 .parent("com.bluecc.bluesrv")
                 .moduleName("bot")
@@ -68,7 +77,7 @@ public class CodeGen {
     /**
      * 模板配置
      */
-    private TemplateConfig.Builder templateConfig() {
+    TemplateConfig.Builder templateConfig() {
         return new TemplateConfig.Builder();
     }
 }
