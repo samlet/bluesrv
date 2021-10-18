@@ -41,3 +41,6 @@ spring:
           hikari:
             max-pool-size: 10
             min-idle: 5
+
+# 业务日期
+mock.date: 2020-12-21

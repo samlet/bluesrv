@@ -18,11 +18,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.bluecc.gen.CodeGen.DATA_SOURCE_CONFIG;
-
 public class SqlRunner {
-    public static void runScript(String sqlFile) throws SQLException, FileNotFoundException {
-        Connection conn = DATA_SOURCE_CONFIG.getConn();
+    public static void runScript(Connection conn, String sqlFile) throws SQLException, FileNotFoundException {
+//        Connection conn = DATA_SOURCE_CONFIG.getConn();
         InputStream inputStream = new FileInputStream(sqlFile);
         ScriptRunner scriptRunner = new ScriptRunner(conn);
         scriptRunner.setAutoCommit(true);
