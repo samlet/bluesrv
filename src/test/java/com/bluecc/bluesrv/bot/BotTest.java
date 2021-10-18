@@ -1,6 +1,8 @@
-package com.bluecc.bluesrv.foo;
+package com.bluecc.bluesrv.bot;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.bluecc.bluesrv.bot.entity.Users;
+import com.bluecc.bluesrv.bot.mapper.UsersMapper;
 import com.bluecc.bluesrv.foo.bean.User;
 import com.bluecc.bluesrv.foo.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
@@ -10,18 +12,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-public class SampleTest {
+public class BotTest {
 
     @Autowired
-    private UserMapper userMapper;
+    private UsersMapper usersMapper;
 
     @Test
     public void testSelect() {
         System.out.println(("----- selectAll method test ------"));
-        List<User> userList = userMapper.selectList(null);
-        assertEquals(5, userList.size());
+        List<Users> userList = usersMapper.selectList(null);
+        assertTrue(userList.size()>1);
         userList.forEach(System.out::println);
     }
 
