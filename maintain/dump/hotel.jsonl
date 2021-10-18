@@ -1,0 +1,7 @@
+{"id": 1, "name": "Hilton", "city": "Berlin", "price_range": "expensive", "breakfast_included": 1, "free_wifi": 1, "swimming_pool": 1, "star_rating": 5}
+{"id": 2, "name": "Hilton", "city": "Frankfurt am Main", "price_range": "expensive", "breakfast_included": 1, "free_wifi": 1, "swimming_pool": 0, "star_rating": 4}
+{"id": 3, "name": "B&B", "city": "Berlin", "price_range": "mid-range", "breakfast_included": 0, "free_wifi": 0, "swimming_pool": 0, "star_rating": 1}
+{"id": 4, "name": "Berlin Wall Hostel", "city": "Berlin", "price_range": "cheap", "breakfast_included": 0, "free_wifi": 1, "swimming_pool": 0, "star_rating": 2}
+{"id": 5, "name": "City Hotel", "city": "Frankfurt am Main", "price_range": "expensive", "breakfast_included": 1, "free_wifi": 1, "swimming_pool": 0, "star_rating": 3}
+{"id": 6, "name": "Jugendherberge", "city": "Berlin", "price_range": "cheap", "breakfast_included": 1, "free_wifi": 0, "swimming_pool": 0, "star_rating": 2}
+{"id": 7, "name": "Berlin Hotel", "city": "Berlin", "price_range": "mid-range", "breakfast_included": 1, "free_wifi": 1, "swimming_pool": 1, "star_rating": 3}
