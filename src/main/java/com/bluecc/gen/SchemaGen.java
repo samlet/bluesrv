@@ -35,7 +35,7 @@ public class SchemaGen {
             System.out.println(tableInfo.getEntityName());
             System.out.println(tableInfo.getControllerName());
             System.out.println("fields: "+tableInfo.getFields()
-                    .stream().map(f -> f.getName())
+                    .stream().map(f -> f.getPropertyName()+"("+f.getPropertyType()+")")
                     .collect(Collectors.joining(", ")));
 //            System.out.println("keys: "+objectMap.keySet());
             TableInfo table = (TableInfo) objectMap.get("table");

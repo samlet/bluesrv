@@ -1,6 +1,6 @@
-package com.bluecc.bluesrv.bean;
+package com.bluecc.bluesrv.foo.bean;
 
-import lombok.Data;
+import lombok.*;
 
 @Data
 public class User {

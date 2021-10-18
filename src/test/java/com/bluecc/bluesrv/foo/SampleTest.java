@@ -1,7 +1,7 @@
-package com.bluecc.bluesrv;
+package com.bluecc.bluesrv.foo;
 
-import com.bluecc.bluesrv.bean.User;
-import com.bluecc.bluesrv.mapper.UserMapper;
+import com.bluecc.bluesrv.foo.bean.User;
+import com.bluecc.bluesrv.foo.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
