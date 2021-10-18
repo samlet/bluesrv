@@ -1,0 +1,28 @@
+create table if not exists order_info(
+    id Int64,
+    consignee String,
+    consignee_tel String,
+    total_amount Decimal(16,2) ,
+    order_status String,
+    user_id Int64,
+    payment_way String,
+    delivery_address String,
+    order_comment String,
+    out_trade_no String,
+    trade_body String,
+    create_time Datetime,
+    operate_time Datetime,
+    expire_time Datetime,
+    process_status String,
+    tracking_no String,
+    parent_order_id Int64,
+    img_url String,
+    province_id Int32,
+    activity_reduce_amount Decimal(16,2) ,
+    coupon_reduce_amount Decimal(16,2) ,
+    original_total_amount Decimal(16,2) ,
+    feight_fee Decimal(16,2) ,
+    feight_fee_reduce Decimal(16,2) ,
+    refundable_time Datetime) engine=MergeTree
+partition by toYYYYMMDD(create_time)
+primary key (id) order by (id);

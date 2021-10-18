@@ -6,21 +6,25 @@ import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.hubspot.jinjava.Jinjava;
 import com.hubspot.jinjava.interpret.JinjavaInterpreter;
 import com.hubspot.jinjava.lib.filter.Filter;
+import org.apache.commons.io.IOUtils;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SchemaGen {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 //        ICodeGen gen=new BotCodeGen();
         testify(new GmallCodeGen());
     }
 
-    private static void testify(ICodeGen gen) {
+    private static void testify(ICodeGen gen) throws IOException {
         ConfigBuilder conf = gen.getConfigBuilder();
 
         List<TableInfo> tableInfoList = conf.getTableInfoList();
@@ -53,7 +57,7 @@ public class SchemaGen {
             context.put("table", tableInfo);
             context.put("flds", tableInfo.getFields());
             String renderedTemplate = jinjava.render(
-                    "create table {{table.name}}(\n" +
+                    "create table if not exists {{table.name}}(\n" +
                             "{% for f in flds %} " +
                             "   {{ f.name }} {{ f|chtype }}" +
                             "{% if not loop.last %}" +
@@ -66,7 +70,18 @@ public class SchemaGen {
                     context);
             System.out.println(renderedTemplate);
             System.out.println();
+
+            FileWriter writer=new FileWriter("./maintain/init_script/"+tableInfo.getName()+".sql");
+            IOUtils.write(renderedTemplate, writer);
+            writer.close();
         }
+
+        List<String> tableNames=tableInfoList.stream().map(t -> t.getName()).collect(Collectors.toList());
+        Map<String, List<String>> cfg=ImmutableMap.of("tables", tableNames);
+        Gson gson=new Gson();
+        FileWriter writer=new FileWriter("./maintain/gencfg.json");
+        IOUtils.write(gson.toJson(cfg), writer);
+        writer.close();
     }
 
     private static class ClickHouseTypeFilter implements Filter {
