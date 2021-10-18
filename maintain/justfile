@@ -1,3 +1,5 @@
 install:
 	pip install clickhouse-driver[numpy]
+	pip install kafka-python
+
 
