@@ -14,7 +14,7 @@ class CustomEncoder(JSONEncoder):
       if isinstance(obj, set):
          return list(obj)
       if isinstance(obj, datetime):
-         return obj.isoformat()
+         return obj.isoformat(sep=' ')
       elif isinstance(obj, Decimal):
           return str(obj)
       return JSONEncoder.default(self, obj)
@@ -44,6 +44,8 @@ class MysqlTool(object):
         $ python -m mysql_tool dump hotel bot dump/hotel.jsonl
         $ python -m mysql_tool dump hotel bot *data   # output to kafka
         $ python -m mysql_tool dump order_info gmall dump/order_info.jsonl
+        $ python -m mysql_tool dump sku_info gmall dump/sku_info.jsonl
+        $ python -m mysql_tool dump spu_info gmall dump/spu_info.jsonl
 
         :param table:
         :return:
