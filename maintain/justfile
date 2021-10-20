@@ -1,5 +1,6 @@
 install:
 	pip install clickhouse-driver[numpy]
 	pip install kafka-python
+    pip install apache-flink==1.13.2
 
 
