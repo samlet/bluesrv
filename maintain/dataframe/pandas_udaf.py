@@ -57,6 +57,7 @@ def pandas_udaf():
 
     table = t_env.from_path("source")
 
+    # 向量化 Python 聚合函数以一个或多个 pandas.Series 类型的参数作为输入，并返回一个标量值作为输出。
     @udaf(result_type=DataTypes.FLOAT(), func_type="pandas")
     def mean_udaf(v):
         return v.mean()
@@ -78,3 +79,18 @@ if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
 
     pandas_udaf()
+
+
+'''
+https://ci.apache.org/projects/flink/flink-docs-master/zh/docs/dev/python/table/udfs/vectorized_python_udfs/
+    向量化 Python 用户自定义函数，是在执行时，通过在 JVM 和 Python VM 之间以 Arrow 列存格式批量传输数据，
+    来执行的函数。 向量化 Python 用户自定义函数的性能通常比非向量化 Python 用户自定义函数要高得多， 
+    因为向量化 Python 用户自定义函数可以大大减少序列化/反序列化的开销和调用开销。 
+    此外，用户可以利用流行的 Python 库（例如 Pandas，Numpy 等）来实现向量化 Python 用户自定义函数的逻辑。 
+    这些 Python 库通常经过高度优化，并提供了高性能的数据结构和功能。 向量化用户自定义函数的定义，
+    与非向量化用户自定义函数具有相似的方式， 用户只需要在调用 udf 或者 udaf 装饰器时添加一个额外的参数 
+    func_type="pandas"，将其标记为一个向量化用户自定义函数即可。
+
+'''
+
+

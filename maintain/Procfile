@@ -1,0 +1,2 @@
+jobs: python -m scheduler.job_procs
+hub:  python -m chart_hub

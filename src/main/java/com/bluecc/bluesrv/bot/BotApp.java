@@ -5,6 +5,10 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/*
+$ just app bot.BotApp
+ */
+
 @SpringBootApplication
 @MapperScan({"com.bluecc.bluesrv.bot.mapper"})
 public class BotApp {

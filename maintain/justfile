@@ -1,6 +1,14 @@
 install:
-	pip install clickhouse-driver[numpy]
-	pip install kafka-python
+    pip install clickhouse-driver[numpy]
+    pip install kafka-python
     pip install apache-flink==1.13.2
+    pip install timeloop
 
+jobs:
+    python -m scheduler.job_procs
 
+hub:
+    python -m chart_hub
+
+srv:
+    foreman start

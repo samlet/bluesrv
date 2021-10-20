@@ -39,19 +39,19 @@ public class UsersController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Users> create(@RequestBody Users student)
+    public ResponseEntity<Users> create(@RequestBody Users o)
             throws URISyntaxException {
-        boolean createdStudent = usersService.save(student);
+        boolean createdStudent = usersService.save(o);
         if (!createdStudent) {
             return ResponseEntity.notFound().build();
         } else {
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{id}")
-                    .buildAndExpand(student.getId())
+                    .buildAndExpand(o.getId())
                     .toUri();
 
             return ResponseEntity.created(uri)
-                    .body(student);
+                    .body(o);
         }
     }
 
@@ -65,5 +65,30 @@ public class UsersController {
         }
     }
 
+    @PutMapping("/")
+    public ResponseEntity<Boolean> update(@RequestBody Users o) {
+//        Users updatedStudent = usersService.update(id, student);
+        boolean updated = usersService.saveOrUpdate(o);
+        if (!updated) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(updated);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteStudent(@PathVariable Integer id) {
+        boolean updated = usersService.removeById(id);
+//        return ResponseEntity.noContent().build();
+        if (!updated) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(updated);
+        }
+    }
 }
 
+
+/*
+https://www.baeldung.com/spring-boot-json
+ */
