@@ -32,6 +32,11 @@ public class GmallCodeGen extends CodeGenBase {
         generator.execute();
     }
 
+    @Override
+    public String moduleName() {
+        return "gmall";
+    }
+
 
     /**
      * 策略配置

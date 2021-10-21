@@ -43,6 +43,11 @@ public class BotCodeGen implements ICodeGen {
         generator.execute();
     }
 
+    @Override
+    public String moduleName() {
+        return "bot";
+    }
+
     public AutoGenerator getAutoGenerator() {
         AutoGenerator generator = new AutoGenerator(dataSourceConfig);
         generator.strategy(strategyConfig().build());

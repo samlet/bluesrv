@@ -17,6 +17,7 @@ def publish_chart_data():
     print("publish chart: {}".format(time.ctime()))
     chart_data = {
         "fields": ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+        # 随机数据
         "data": {
             "商家A": [randrange(0, 100) for _ in range(6)],
             "商家B": [randrange(0, 100) for _ in range(6)]

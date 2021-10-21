@@ -6,4 +6,5 @@ public interface ICodeGen {
     ConfigBuilder getConfigBuilder();
 
     void gen();
+    String moduleName();
 }

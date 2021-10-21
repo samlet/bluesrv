@@ -1,5 +1,3 @@
-from random import randrange
-
 from sanic import Sanic
 from sanic.response import json as resp_json, html
 
@@ -10,7 +8,6 @@ import redis
 pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True)
 r = redis.Redis(connection_pool=pool)
 
-# 初始化 Sanic
 app = Sanic(__name__)
 
 def bar_base(chart_name:str) -> Bar:
