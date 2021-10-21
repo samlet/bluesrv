@@ -43,6 +43,8 @@ import java.util.stream.Collectors;
  * $ just run gen.SchemaGen --module ofbiz
  * $ just run gen.SchemaGen --module ofbiz -s  # 启动schema-rest服务
  * $ just run gen.SchemaGen -m ofbiz -m bot -s
+ * $ curl --request GET \
+ *   --url 'http://127.0.0.1:1080/schema?name=hotel&type=kafka'
  */
 public class SchemaGen {
     @Parameter(names = {"--module", "-m"})
