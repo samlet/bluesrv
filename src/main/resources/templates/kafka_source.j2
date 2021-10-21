@@ -1,0 +1,12 @@
+CREATE TABLE {{table.name}} (
+    {% for f in table.fields -%}
+    {{f.name}} {{f.flinkType}}{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ) WITH (
+    'connector' = 'kafka',
+    'topic' = '{{table.name}}',
+    'properties.bootstrap.servers' = 'localhost:9092',
+    'properties.group.id' = 'default',
+    'scan.startup.mode' = 'latest-offset',
+    'format' = 'json'
+  )
