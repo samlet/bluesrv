@@ -41,12 +41,16 @@ import java.util.stream.Collectors;
  * $ just run gen.SchemaGen -m bot
  * $ just run gen.SchemaGen --module gmall
  * $ just run gen.SchemaGen --module ofbiz
+ * $ just run gen.SchemaGen --module ofbiz -s  # 启动schema-rest服务
+ * $ just run gen.SchemaGen -m ofbiz -m bot -s
  */
 public class SchemaGen {
     @Parameter(names = {"--module", "-m"})
-    String module;
+    List<String> modules= new ArrayList<>();
     @Parameter(names = {"--service", "-s"})
     boolean service;
+    @Parameter(names = {"--write", "-w"})
+    boolean writeScriptModule;
 
     public static void main(String[] args) throws IOException {
         SchemaGen main = new SchemaGen();
@@ -55,27 +59,37 @@ public class SchemaGen {
                 .build()
                 .parse(args);
 
-        ICodeGen gen = null;
-        if (main.module == null) {
-            gen = new GmallCodeGen();
-        } else if (main.module.equals("bot")) {
-            gen = new BotCodeGen();
-        } else if (main.module.equals("ofbiz")) {
-            gen = new OfbizCodeGen();
-        } else {
-            gen = new GmallCodeGen();
+        if(main.modules.isEmpty()){
+            main.modules.add("bot");
         }
 
-        main.testify(gen);
+        for (String module : main.modules) {
+            ICodeGen gen = null;
+            switch (module) {
+                case "bot":
+                    gen = new BotCodeGen();
+                    break;
+                case "ofbiz":
+                    gen = new OfbizCodeGen();
+                    break;
+                case "gmall":
+                    gen = new GmallCodeGen();
+                    break;
+                default:
+                    throw new RuntimeException("No such module " + module);
+            }
+
+            main.testify(gen, main.writeScriptModule);
+        }
 
         if (main.service) {
-            main.serve(gen);
+            main.serve();
         } else {
             System.exit(0);
         }
     }
 
-    void serve(ICodeGen gen) {
+    void serve() {
         ServerBuilder sb = Server.builder();
         sb.http(1080);
 
@@ -166,7 +180,7 @@ public class SchemaGen {
         return type_mappings;
     }
 
-    void testify(ICodeGen gen) throws IOException {
+    void testify(ICodeGen gen, boolean writeScript) throws IOException {
         ConfigBuilder conf = gen.getConfigBuilder();
 
         List<TableInfo> tableInfoList = conf.getTableInfoList();
@@ -174,43 +188,46 @@ public class SchemaGen {
         // with template
         Jinjava jinjava = new Jinjava();
         jinjava.getGlobalContext().registerFilter(new ClickHouseTypeFilter());
-        String dir = "./maintain/init_script/" + gen.moduleName() + "/";
-        File newDirectory = new File(dir);
-        if (!newDirectory.exists()) {
-            Preconditions.checkArgument(newDirectory.mkdirs(),
-                    "create module directory");
-        }
 
-        for (TableInfo tableInfo : tableInfoList) {
-            Map<String, Object> context = Maps.newHashMap();
-            context.put("table", tableInfo);
-            context.put("flds", tableInfo.getFields());
-            String renderedTemplate = jinjava.render(
-                    "create table if not exists {{table.name}}(\n" +
-                            "{% for f in flds %} " +
-                            "   {{ f.name }} {{ f|chtype }}" +
-                            "{% if not loop.last %}" +
-                            ",\n" +
-                            "{% endif %}" +
-                            "{% endfor %}" +
-                            ") engine=MergeTree\n" +
-                            "partition by toYYYYMMDD(create_time)\n" +
-                            "primary key (id) order by (id);",
-                    context);
-            System.out.println(renderedTemplate);
-            System.out.println();
+        if (writeScript) {
+            String dir = "./maintain/init_script/" + gen.moduleName() + "/";
+            File newDirectory = new File(dir);
+            if (!newDirectory.exists()) {
+                Preconditions.checkArgument(newDirectory.mkdirs(),
+                        "create module directory");
+            }
 
-            FileWriter writer = new FileWriter(dir + tableInfo.getName() + ".sql");
-            IOUtils.write(renderedTemplate, writer);
+            for (TableInfo tableInfo : tableInfoList) {
+                Map<String, Object> context = Maps.newHashMap();
+                context.put("table", tableInfo);
+                context.put("flds", tableInfo.getFields());
+                String renderedTemplate = jinjava.render(
+                        "create table if not exists {{table.name}}(\n" +
+                                "{% for f in flds %} " +
+                                "   {{ f.name }} {{ f|chtype }}" +
+                                "{% if not loop.last %}" +
+                                ",\n" +
+                                "{% endif %}" +
+                                "{% endfor %}" +
+                                ") engine=MergeTree\n" +
+                                "partition by toYYYYMMDD(create_time)\n" +
+                                "primary key (id) order by (id);",
+                        context);
+                System.out.println(renderedTemplate);
+                System.out.println();
+
+                FileWriter writer = new FileWriter(dir + tableInfo.getName() + ".sql");
+                IOUtils.write(renderedTemplate, writer);
+                writer.close();
+            }
+
+            List<String> tableNames = tableInfoList.stream().map(t -> t.getName()).collect(Collectors.toList());
+            Map<String, List<String>> cfg = ImmutableMap.of("tables", tableNames);
+            Gson gson = new Gson();
+            FileWriter writer = new FileWriter("./maintain/gencfg.json");
+            IOUtils.write(gson.toJson(cfg), writer);
             writer.close();
         }
-
-        List<String> tableNames = tableInfoList.stream().map(t -> t.getName()).collect(Collectors.toList());
-        Map<String, List<String>> cfg = ImmutableMap.of("tables", tableNames);
-        Gson gson = new Gson();
-        FileWriter writer = new FileWriter("./maintain/gencfg.json");
-        IOUtils.write(gson.toJson(cfg), writer);
-        writer.close();
 
         // for debug
 //        printFields(conf, tableInfoList);
@@ -259,7 +276,7 @@ public class SchemaGen {
         });
     }
 
-    private void printFields(ConfigBuilder conf, List<TableInfo> tableInfoList) {
+    public void printFields(ConfigBuilder conf, List<TableInfo> tableInfoList) {
         for (TableInfo tableInfo : tableInfoList) {
             // template
             VelocityTemplateEngine velocityTemplateEngine = new VelocityTemplateEngine();
