@@ -2,8 +2,10 @@ package com.bluecc.gen;
 
 import com.baomidou.mybatisplus.core.enums.SqlLike;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
-import com.baomidou.mybatisplus.generator.config.*;
-import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
+import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
+import com.baomidou.mybatisplus.generator.config.GlobalConfig;
+import com.baomidou.mybatisplus.generator.config.PackageConfig;
+import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
 import com.baomidou.mybatisplus.generator.config.po.LikeTable;
 import com.baomidou.mybatisplus.generator.config.querys.MySqlQuery;
@@ -14,9 +16,9 @@ import java.sql.SQLException;
 /**
  * $ just run gen.CodeGen
  */
-public class GmallCodeGen extends CodeGenBase {
+public class OfbizCodeGen extends CodeGenBase {
     public final DataSourceConfig dataSourceConfig =
-            new DataSourceConfig.Builder("jdbc:mysql://127.0.0.1:3306/gmall", "root", "root")
+            new DataSourceConfig.Builder("jdbc:mysql://127.0.0.1:3306/ofbiz", "root", "root")
                     .dbQuery(new MySqlQuery())
                     .schema("mybatis-plus")
                     .typeConvert(new MySqlTypeConvert())
@@ -24,7 +26,7 @@ public class GmallCodeGen extends CodeGenBase {
                     .build();
 
     public static void main(String[] args) throws SQLException {
-        new GmallCodeGen().gen();
+        new OfbizCodeGen().gen();
         System.out.println("ok.");
     }
 
@@ -36,7 +38,7 @@ public class GmallCodeGen extends CodeGenBase {
 
     @Override
     public String moduleName() {
-        return "gmall";
+        return "ofbiz";
     }
 
 
@@ -45,9 +47,9 @@ public class GmallCodeGen extends CodeGenBase {
      */
     public StrategyConfig.Builder strategyConfig() {
         return new StrategyConfig.Builder()
-                .notLikeTable(new LikeTable("base_", SqlLike.RIGHT));
-//                .addInclude("cart_info", "coupon_info",
-//                        "favor_info", "order_detail", "order_info");
+                .likeTable(new LikeTable("party", SqlLike.RIGHT))
+//                .likeTable(new LikeTable("person", SqlLike.RIGHT))
+                ;
     }
 
     /**
@@ -68,7 +70,7 @@ public class GmallCodeGen extends CodeGenBase {
     public PackageConfig.Builder packageConfig() {
         return new PackageConfig.Builder()
                 .parent("com.bluecc.bluesrv")
-                .moduleName("gmall");
+                .moduleName(moduleName());
     }
 
     @Override

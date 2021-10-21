@@ -16,6 +16,15 @@ import com.google.gson.Gson;
 import com.hubspot.jinjava.Jinjava;
 import com.hubspot.jinjava.interpret.JinjavaInterpreter;
 import com.hubspot.jinjava.lib.filter.Filter;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
+import com.linecorp.armeria.common.MediaType;
+import com.linecorp.armeria.server.Server;
+import com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.server.annotation.Default;
+import com.linecorp.armeria.server.annotation.Get;
+import com.linecorp.armeria.server.annotation.Param;
+import com.linecorp.armeria.server.annotation.Post;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,15 +34,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
  * $ just run gen.SchemaGen -m bot
  * $ just run gen.SchemaGen --module gmall
+ * $ just run gen.SchemaGen --module ofbiz
  */
 public class SchemaGen {
     @Parameter(names = {"--module", "-m"})
     String module;
+    @Parameter(names = {"--service", "-s"})
+    boolean service;
 
     public static void main(String[] args) throws IOException {
         SchemaGen main = new SchemaGen();
@@ -42,16 +55,52 @@ public class SchemaGen {
                 .build()
                 .parse(args);
 
+        ICodeGen gen = null;
         if (main.module == null) {
-            main.testify(new GmallCodeGen());
+            gen = new GmallCodeGen();
         } else if (main.module.equals("bot")) {
-            ICodeGen gen = new BotCodeGen();
-            main.testify(gen);
+            gen = new BotCodeGen();
+        } else if (main.module.equals("ofbiz")) {
+            gen = new OfbizCodeGen();
         } else {
-            main.testify(new GmallCodeGen());
+            gen = new GmallCodeGen();
         }
 
-        System.exit(0);
+        main.testify(gen);
+
+        if (main.service) {
+            main.serve(gen);
+        } else {
+            System.exit(0);
+        }
+    }
+
+    void serve(ICodeGen gen) {
+        ServerBuilder sb = Server.builder();
+        sb.http(1080);
+
+        sb.service("/", (ctx, req) -> HttpResponse.of("ok!"));
+        sb.annotatedService(new Object() {
+            @Get("/schema")
+            public HttpResponse greet(@Param("name") String name,
+                                      @Param("type") @Default("kafka") String type) {
+                // "kafka" is used by default if there is no type parameter in the request.
+                String template = templateRepos.get(Tuple2.of(name, type));
+                if (template != null) {
+                    return HttpResponse.of(template);
+                } else {
+                    return HttpResponse.of(HttpStatus.NOT_FOUND,
+                            MediaType.PLAIN_TEXT_UTF_8,
+                            "Cannot find template %s(%s)",
+                            name, type
+                    );
+                }
+            }
+        });
+
+        Server server = sb.build();
+        CompletableFuture<Void> future = server.start();
+        future.join();
     }
 
     static class Mapping {
@@ -72,6 +121,8 @@ public class SchemaGen {
             for (Mapping mapping : mappings) {
                 if (StringUtils.startsWith(mysqlType, "NUMERIC(")) {
                     return mapping.flinkType.replaceFirst("NUMERIC", "DECIMAL");
+                } else if (StringUtils.startsWith(mysqlType, "DATETIME(")) {
+                    return mysqlType.replaceFirst("DATETIME", "TIMESTAMP");
                 } else if (StringUtils.startsWith(mysqlType, "DECIMAL(")) {
                     return mysqlType; // same type
                 } else if (StringUtils.startsWith(mysqlType, "CHAR(")
@@ -165,13 +216,15 @@ public class SchemaGen {
 //        printFields(conf, tableInfoList);
         buildPipeline(tableInfoList, jinjava);
 
-        System.out.println("created.");
+        System.out.println("totall table " + tableInfoList.size() + " created.");
     }
+
+    Map<Tuple2<String, String>, String> templateRepos = Maps.newHashMap();
 
     private void buildPipeline(List<TableInfo> tableInfoList, Jinjava jinjava) {
         tableInfoList.forEach(t -> {
             GenTypes.SqlTable table = new GenTypes.SqlTable();
-            table.setName(t.getName());
+            table.setName(t.getName().toLowerCase());
             System.out.println(t.getName());
             t.getFields().forEach(f -> {
                 System.out.println("\t" + f.getName() + ", "
@@ -179,7 +232,7 @@ public class SchemaGen {
                         + get_mappings().getFlinkTypeMapping(f.getType())
                 );
                 table.getFields().add(GenTypes.SqlField.builder()
-                        .name(f.getName())
+                        .name(f.getName().toLowerCase())
                         .flinkType(get_mappings().getFlinkTypeMapping(f.getType()))
                         .sqlType(f.getType())
                         .build());
@@ -196,10 +249,13 @@ public class SchemaGen {
                         Charsets.UTF_8);
                 String renderedTemplate = jinjava.render(template, context);
                 System.out.println(renderedTemplate);
+
+                templateRepos.put(Tuple2.of(table.name, "kafka"), renderedTemplate);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             System.out.println();
+
         });
     }
 
