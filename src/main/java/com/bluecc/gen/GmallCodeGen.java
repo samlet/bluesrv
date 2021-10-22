@@ -45,7 +45,8 @@ public class GmallCodeGen extends CodeGenBase {
      */
     public StrategyConfig.Builder strategyConfig() {
         return new StrategyConfig.Builder()
-                .notLikeTable(new LikeTable("base_", SqlLike.RIGHT));
+//                .notLikeTable(new LikeTable("base_", SqlLike.RIGHT));
+                .notLikeTable(new LikeTable("tmp_", SqlLike.RIGHT));
 //                .addInclude("cart_info", "coupon_info",
 //                        "favor_info", "order_detail", "order_info");
     }
@@ -55,9 +56,9 @@ public class GmallCodeGen extends CodeGenBase {
      */
     public GlobalConfig.Builder globalConfig() {
         return new GlobalConfig.Builder()
-//                .fileOverride()
+                .fileOverride()
                 .enableSwagger()
-                .outputDir("/opt/gen")
+                .outputDir("/opt/gen/gmall")
                 .author("samlet")
                 .disableOpenDir();
     }
