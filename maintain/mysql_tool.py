@@ -7,17 +7,7 @@ from pymysql.cursors import SSDictCursor
 
 # Define a class to encode values to a json representation
 import io_utils
-
-
-class CustomEncoder(JSONEncoder):
-   def default(self, obj):
-      if isinstance(obj, set):
-         return list(obj)
-      if isinstance(obj, datetime):
-         return obj.isoformat(sep=' ')
-      elif isinstance(obj, Decimal):
-          return str(obj)
-      return JSONEncoder.default(self, obj)
+from helpers import CustomEncoder
 
 
 class MysqlTool(object):

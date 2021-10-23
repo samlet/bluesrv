@@ -3,6 +3,7 @@ install:
     pip install kafka-python
     pip install apache-flink==1.13.2
     pip install timeloop
+    pip install faker
 
 jobs:
     python -m scheduler.job_procs
@@ -12,3 +13,9 @@ hub:
 
 srv:
     foreman start
+
+create topic:
+    kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic {{topic}}
+
+consume topic:
+    kafka-console-consumer --bootstrap-server localhost:9092 --topic {{topic}}
