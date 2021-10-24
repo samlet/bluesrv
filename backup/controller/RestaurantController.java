@@ -1,7 +1,7 @@
 package com.bluecc.bluesrv.bot.controller;
 
-import com.bluecc.bluesrv.bot.entity.Hotel;
-import com.bluecc.bluesrv.bot.service.IHotelService;
+import com.bluecc.bluesrv.bot.entity.Restaurant;
+import com.bluecc.bluesrv.bot.service.IRestaurantService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +15,9 @@ import java.net.URISyntaxException;
 
 /**
  * <p>
- *  HotelController
+ *  RestaurantController
  *  <pre>
- *  $ curl localhost:8088/bot/hotel/ping
+ *  $ curl localhost:8088/bot/restaurant/ping
  *  </pre>
  * </p>
  *
@@ -25,12 +25,12 @@ import java.net.URISyntaxException;
  * @since 2021-10-25
  */
 @RestController
-@RequestMapping("/bot/hotel")
-public class HotelController {
-    private static final Logger logger = LoggerFactory.getLogger(HotelController.class);
+@RequestMapping("/bot/restaurant")
+public class RestaurantController {
+    private static final Logger logger = LoggerFactory.getLogger(RestaurantController.class);
 
     @Autowired
-    private IHotelService hotelService;
+    private IRestaurantService restaurantService;
 
     @RequestMapping(value = "ping", method = RequestMethod.GET)
     @ResponseBody
@@ -39,9 +39,9 @@ public class HotelController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Hotel> create(@RequestBody Hotel o)
+    public ResponseEntity<Restaurant> create(@RequestBody Restaurant o)
             throws URISyntaxException {
-        boolean createdStudent = hotelService.save(o);
+        boolean createdStudent = restaurantService.save(o);
         if (!createdStudent) {
             return ResponseEntity.notFound().build();
         } else {
@@ -56,8 +56,8 @@ public class HotelController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Hotel> read(@PathVariable Integer id) {
-        Hotel found= hotelService.getById(id);
+    public ResponseEntity<Restaurant> read(@PathVariable Integer id) {
+        Restaurant found= restaurantService.getById(id);
         if (found == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -66,8 +66,8 @@ public class HotelController {
     }
 
     @PutMapping("/")
-    public ResponseEntity<Boolean> update(@RequestBody Hotel o) {
-        boolean updated = hotelService.saveOrUpdate(o);
+    public ResponseEntity<Boolean> update(@RequestBody Restaurant o) {
+        boolean updated = restaurantService.saveOrUpdate(o);
         if (!updated) {
             return ResponseEntity.notFound().build();
         } else {
@@ -77,7 +77,7 @@ public class HotelController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Integer id) {
-        boolean updated = hotelService.removeById(id);
+        boolean updated = restaurantService.removeById(id);
         if (!updated) {
             return ResponseEntity.notFound().build();
         } else {
@@ -85,5 +85,3 @@ public class HotelController {
         }
     }
 }
-
-

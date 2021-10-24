@@ -1,15 +1,13 @@
 package com.bluecc.bluesrv.bot.controller;
 
-
 import com.bluecc.bluesrv.bot.entity.Users;
 import com.bluecc.bluesrv.bot.service.IUsersService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -17,17 +15,19 @@ import java.net.URISyntaxException;
 
 /**
  * <p>
- *  前端控制器
+ *  UsersController
+ *  <pre>
  *  $ curl localhost:8088/bot/users/ping
+ *  </pre>
  * </p>
  *
  * @author samlet
- * @since 2021-10-17
+ * @since 2021-10-25
  */
 @RestController
 @RequestMapping("/bot/users")
 public class UsersController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UsersController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UsersController.class);
 
     @Autowired
     private IUsersService usersService;
@@ -67,7 +67,6 @@ public class UsersController {
 
     @PutMapping("/")
     public ResponseEntity<Boolean> update(@RequestBody Users o) {
-//        Users updatedStudent = usersService.update(id, student);
         boolean updated = usersService.saveOrUpdate(o);
         if (!updated) {
             return ResponseEntity.notFound().build();
@@ -77,9 +76,8 @@ public class UsersController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteStudent(@PathVariable Integer id) {
+    public ResponseEntity<Object> delete(@PathVariable Integer id) {
         boolean updated = usersService.removeById(id);
-//        return ResponseEntity.noContent().build();
         if (!updated) {
             return ResponseEntity.notFound().build();
         } else {
@@ -89,6 +87,3 @@ public class UsersController {
 }
 
 
-/*
-https://www.baeldung.com/spring-boot-json
- */

@@ -24,13 +24,15 @@ import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.server.annotation.Default;
 import com.linecorp.armeria.server.annotation.Get;
 import com.linecorp.armeria.server.annotation.Param;
-import com.linecorp.armeria.server.annotation.Post;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,15 +46,19 @@ import java.util.stream.Collectors;
  * $ just run gen.SchemaGen --module ofbiz -s  # 启动schema-rest服务
  * $ just run gen.SchemaGen -m ofbiz -m bot -s
  * $ curl --request GET \
- *   --url 'http://127.0.0.1:1080/schema?name=hotel&type=kafka'
+ * --url 'http://127.0.0.1:1080/schema?name=hotel&type=kafka'
+ *
+ * $ just run gen.SchemaGen -m bot -c /tmp/xxxx
  */
 public class SchemaGen {
     @Parameter(names = {"--module", "-m"})
-    List<String> modules= new ArrayList<>();
+    List<String> modules = new ArrayList<>();
     @Parameter(names = {"--service", "-s"})
     boolean service;
     @Parameter(names = {"--write", "-w"})
     boolean writeScriptModule;
+    @Parameter(names = {"--codeTarget", "-c"})
+    String codeTarget;
 
     public static void main(String[] args) throws IOException {
         SchemaGen main = new SchemaGen();
@@ -61,7 +67,7 @@ public class SchemaGen {
                 .build()
                 .parse(args);
 
-        if(main.modules.isEmpty()){
+        if (main.modules.isEmpty()) {
             main.modules.add("bot");
         }
 
@@ -233,18 +239,30 @@ public class SchemaGen {
 
         // for debug
 //        printFields(conf, tableInfoList);
-        buildPipeline(tableInfoList, jinjava);
+        buildPipeline(gen, tableInfoList, jinjava);
 
         System.out.println("totall table " + tableInfoList.size() + " created.");
     }
 
     Map<Tuple2<String, String>, String> templateRepos = Maps.newHashMap();
 
-    private void buildPipeline(List<TableInfo> tableInfoList, Jinjava jinjava) {
+    private void buildPipeline(ICodeGen gen, List<TableInfo> tableInfoList, Jinjava jinjava) {
         tableInfoList.forEach(t -> {
-            GenTypes.SqlTable table = new GenTypes.SqlTable();
-            table.setName(t.getName().toLowerCase());
-            System.out.println(t.getName());
+//            GenTypes.SqlTable table = new GenTypes.SqlTable();
+            GenTypes.SqlTable table = GenTypes.SqlTable.builder()
+                    .name(t.getName().toLowerCase())
+                    .module(gen.moduleName())
+                    .entityName(t.getEntityName())
+                    .serviceName(t.getServiceName())
+                    .serviceVar(Util.toVarName(t.getEntityName() + "Service"))
+                    .controllerName(t.getControllerName())
+                    .fields(new ArrayList<>())
+                    .build();
+
+            System.out.format("entity name: %s.%s, %s\n", gen.moduleName(), t.getName(), t.getEntityName());
+            System.out.format("service name: %s, %s\n", t.getServiceName(),
+                    Util.toVarName(t.getEntityName() + "Service"));
+            System.out.format("controller name: %s\n", t.getControllerName());
             t.getFields().forEach(f -> {
                 System.out.println("\t" + f.getName() + ", "
                         + f.getType() + ", "
@@ -261,21 +279,45 @@ public class SchemaGen {
             Map<String, Object> context = Maps.newHashMap();
             context.put("table", table);
 
-            String template = null;
-            try {
-                template = Resources.toString(Resources
-                                .getResource("templates/kafka_source.j2"),
-                        Charsets.UTF_8);
-                String renderedTemplate = jinjava.render(template, context);
-                System.out.println(renderedTemplate);
+            buildWithTemplate("kafka", "kafka_source.j2",
+                    jinjava, table, context);
+            String code=buildWithTemplate("rest", "rest_source.j2",
+                    jinjava, table, context);
 
-                templateRepos.put(Tuple2.of(table.name, "kafka"), renderedTemplate);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(codeTarget!=null){
+                Path path = Paths.get(codeTarget, table.controllerName+".java");
+                System.out.println(".. write code to "+path);
+                FileWriter writer= null;
+                try {
+                    writer = new FileWriter(path.toFile());
+                    IOUtils.write(code, writer);
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                System.out.println(".. only show source code");
             }
-            System.out.println();
-
         });
+    }
+
+    private String buildWithTemplate(String tplName, String tplSource,
+                                     Jinjava jinjava, GenTypes.SqlTable table,
+                                     Map<String, Object> context) {
+        String renderedTemplate = null;
+        try {
+            String template = Resources.toString(Resources
+                            .getResource("templates/"+tplSource),
+                    Charsets.UTF_8);
+            renderedTemplate = jinjava.render(template, context);
+            System.out.println(renderedTemplate);
+
+            templateRepos.put(Tuple2.of(table.name, tplName), renderedTemplate);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println();
+        return renderedTemplate;
     }
 
     public void printFields(ConfigBuilder conf, List<TableInfo> tableInfoList) {

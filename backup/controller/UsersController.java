@@ -1,7 +1,7 @@
 package com.bluecc.bluesrv.bot.controller;
 
-import com.bluecc.bluesrv.bot.entity.Hotel;
-import com.bluecc.bluesrv.bot.service.IHotelService;
+import com.bluecc.bluesrv.bot.entity.Users;
+import com.bluecc.bluesrv.bot.service.IUsersService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,22 +15,22 @@ import java.net.URISyntaxException;
 
 /**
  * <p>
- *  HotelController
+ *  UsersController
  *  <pre>
- *  $ curl localhost:8088/bot/hotel/ping
+ *  $ curl localhost:8088/bot/users/ping
  *  </pre>
  * </p>
  *
  * @author samlet
- * @since 2021-10-25
+ * @since 2021-10-17
  */
 @RestController
-@RequestMapping("/bot/hotel")
-public class HotelController {
-    private static final Logger logger = LoggerFactory.getLogger(HotelController.class);
+@RequestMapping("/bot/users")
+public class UsersController {
+    private static final Logger logger = LoggerFactory.getLogger(UsersController.class);
 
     @Autowired
-    private IHotelService hotelService;
+    private IUsersService usersService;
 
     @RequestMapping(value = "ping", method = RequestMethod.GET)
     @ResponseBody
@@ -39,9 +39,9 @@ public class HotelController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Hotel> create(@RequestBody Hotel o)
+    public ResponseEntity<Users> create(@RequestBody Users o)
             throws URISyntaxException {
-        boolean createdStudent = hotelService.save(o);
+        boolean createdStudent = usersService.save(o);
         if (!createdStudent) {
             return ResponseEntity.notFound().build();
         } else {
@@ -56,8 +56,8 @@ public class HotelController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Hotel> read(@PathVariable Integer id) {
-        Hotel found= hotelService.getById(id);
+    public ResponseEntity<Users> read(@PathVariable Integer id) {
+        Users found= usersService.getById(id);
         if (found == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -66,8 +66,8 @@ public class HotelController {
     }
 
     @PutMapping("/")
-    public ResponseEntity<Boolean> update(@RequestBody Hotel o) {
-        boolean updated = hotelService.saveOrUpdate(o);
+    public ResponseEntity<Boolean> update(@RequestBody Users o) {
+        boolean updated = usersService.saveOrUpdate(o);
         if (!updated) {
             return ResponseEntity.notFound().build();
         } else {
@@ -77,7 +77,7 @@ public class HotelController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Integer id) {
-        boolean updated = hotelService.removeById(id);
+        boolean updated = usersService.removeById(id);
         if (!updated) {
             return ResponseEntity.notFound().build();
         } else {
@@ -87,3 +87,6 @@ public class HotelController {
 }
 
 
+/*
+https://www.baeldung.com/spring-boot-json
+ */
