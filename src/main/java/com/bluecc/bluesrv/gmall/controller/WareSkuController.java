@@ -1,21 +1,89 @@
 package com.bluecc.bluesrv.gmall.controller;
 
+import com.bluecc.bluesrv.gmall.entity.WareSku;
+import com.bluecc.bluesrv.gmall.service.IWareSkuService;
 
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import org.springframework.stereotype.Controller;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * <p>
- * sku与仓库关联表 前端控制器
+ *  WareSkuController
+ *  <pre>
+ *  $ curl localhost:8088/gmall/ware_sku/ping
+ *  </pre>
  * </p>
  *
  * @author samlet
- * @since 2021-10-23
+ * @since 2021-10-25
  */
-@Controller
-@RequestMapping("/gmall/wareSku")
+@RestController
+@RequestMapping("/gmall/ware_sku")
 public class WareSkuController {
+    private static final Logger logger = LoggerFactory.getLogger(WareSkuController.class);
 
+    @Autowired
+    private IWareSkuService wareSkuService;
+
+    @RequestMapping(value = "ping", method = RequestMethod.GET)
+    @ResponseBody
+    public String ping(){
+        return "pong";
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<WareSku> create(@RequestBody WareSku o)
+            throws URISyntaxException {
+        boolean createdStudent = wareSkuService.save(o);
+        if (!createdStudent) {
+            return ResponseEntity.notFound().build();
+        } else {
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(o.getId())
+                    .toUri();
+
+            return ResponseEntity.created(uri)
+                    .body(o);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<WareSku> read(@PathVariable Integer id) {
+        WareSku found= wareSkuService.getById(id);
+        if (found == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(found);
+        }
+    }
+
+    @PutMapping("/")
+    public ResponseEntity<Boolean> update(@RequestBody WareSku o) {
+        boolean updated = wareSkuService.saveOrUpdate(o);
+        if (!updated) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(updated);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> delete(@PathVariable Integer id) {
+        boolean updated = wareSkuService.removeById(id);
+        if (!updated) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(updated);
+        }
+    }
 }
+
 
