@@ -47,7 +47,8 @@ public class OfbizCodeGen extends CodeGenBase {
      */
     public StrategyConfig.Builder strategyConfig() {
         return new StrategyConfig.Builder()
-                .likeTable(new LikeTable("party", SqlLike.RIGHT))
+                .addInclude("party", "person")
+//                .likeTable(new LikeTable("party", SqlLike.RIGHT))
 //                .likeTable(new LikeTable("person", SqlLike.RIGHT))
                 ;
     }
@@ -59,7 +60,7 @@ public class OfbizCodeGen extends CodeGenBase {
         return new GlobalConfig.Builder()
 //                .fileOverride()
                 .enableSwagger()
-                .outputDir("/opt/gen")
+                .outputDir("/opt/gen/ofbiz")
                 .author("samlet")
                 .disableOpenDir();
     }

@@ -1,0 +1,15 @@
+package com.bluecc.refs.ecommerce.beans;
+
+import lombok.Data;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.*;
+
+@Data
+public class {{table.entityName}} implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    {% for f in table.fields -%}
+    {{f.propertyType}} {{f.propertyName}};
+    {% endfor %}
+}

@@ -47,8 +47,9 @@ import java.util.stream.Collectors;
  * $ just run gen.SchemaGen -m ofbiz -m bot -s
  * $ curl --request GET \
  * --url 'http://127.0.0.1:1080/schema?name=hotel&type=kafka'
- *
+ * <p>
  * $ just run gen.SchemaGen -m bot -c /tmp/xxxx
+ * $ just run gen.SchemaGen -m ofbiz -b /tmp/xxx
  */
 public class SchemaGen {
     @Parameter(names = {"--module", "-m"})
@@ -59,6 +60,8 @@ public class SchemaGen {
     boolean writeScriptModule;
     @Parameter(names = {"--codeTarget", "-c"})
     String codeTarget;
+    @Parameter(names = {"--beanTarget", "-b"})
+    String beanTarget;
 
     public static void main(String[] args) throws IOException {
         SchemaGen main = new SchemaGen();
@@ -264,14 +267,19 @@ public class SchemaGen {
                     Util.toVarName(t.getEntityName() + "Service"));
             System.out.format("controller name: %s\n", t.getControllerName());
             t.getFields().forEach(f -> {
-                System.out.println("\t" + f.getName() + ", "
+                System.out.println("\t"
+                        + f.getPropertyName() + ": "
+                        + f.getName() + ", "
                         + f.getType() + ", "
+                        + f.getPropertyType() + ", "
                         + get_mappings().getFlinkTypeMapping(f.getType())
                 );
                 table.getFields().add(GenTypes.SqlField.builder()
                         .name(f.getName().toLowerCase())
                         .flinkType(get_mappings().getFlinkTypeMapping(f.getType()))
                         .sqlType(f.getType())
+                        .propertyName(f.getPropertyName())
+                        .propertyType(f.getPropertyType())
                         .build());
             });
             System.out.println();
@@ -281,24 +289,36 @@ public class SchemaGen {
 
             buildWithTemplate("kafka", "kafka_source.j2",
                     jinjava, table, context);
-            String code=buildWithTemplate("rest", "rest_source.j2",
+            String codeController = buildWithTemplate("rest", "rest_source.j2",
+                    jinjava, table, context);
+            String codeBean = buildWithTemplate("bean", "bean_source.j2",
                     jinjava, table, context);
 
-            if(codeTarget!=null){
-                Path path = Paths.get(codeTarget, table.controllerName+".java");
-                System.out.println(".. write code to "+path);
-                FileWriter writer= null;
-                try {
-                    writer = new FileWriter(path.toFile());
-                    IOUtils.write(code, writer);
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }else{
+            // write controllers
+            if (codeTarget != null) {
+                String fileTarget=table.controllerName + ".java";
+                writeCode(codeController, codeTarget, fileTarget);
+            } else {
                 System.out.println(".. only show source code");
             }
+            if (beanTarget != null) {
+                String fileTarget=table.entityName + ".java";
+                writeCode(codeBean, beanTarget, fileTarget);
+            }
         });
+    }
+
+    private void writeCode(String codeController, String rootDir, String fileTarget) {
+        Path path = Paths.get(rootDir, fileTarget);
+        System.out.println(".. write code to " + path);
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter(path.toFile());
+            IOUtils.write(codeController, writer);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String buildWithTemplate(String tplName, String tplSource,
@@ -307,7 +327,7 @@ public class SchemaGen {
         String renderedTemplate = null;
         try {
             String template = Resources.toString(Resources
-                            .getResource("templates/"+tplSource),
+                            .getResource("templates/" + tplSource),
                     Charsets.UTF_8);
             renderedTemplate = jinjava.render(template, context);
             System.out.println(renderedTemplate);

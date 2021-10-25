@@ -26,6 +26,9 @@ public class GenTypes {
         String name;
         String sqlType;
         String flinkType;
+
+        String propertyName;
+        String propertyType;
     }
 }
 
