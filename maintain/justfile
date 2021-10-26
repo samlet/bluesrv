@@ -19,3 +19,7 @@ create topic:
 
 consume topic:
     kafka-console-consumer --bootstrap-server localhost:9092 --topic {{topic}}
+
+list topic:
+	kafka-console-consumer --bootstrap-server localhost:9092 --topic {{topic}} --from-beginning
+

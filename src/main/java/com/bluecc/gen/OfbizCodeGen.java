@@ -47,7 +47,9 @@ public class OfbizCodeGen extends CodeGenBase {
      */
     public StrategyConfig.Builder strategyConfig() {
         return new StrategyConfig.Builder()
-                .addInclude("party", "person")
+                .addInclude("party", "person", "product", "inventory_item", "product_feature",
+                        "product_feature_price", "product_feature_type", "product_geo",
+                        "product_feature_appl", "product_facility")
 //                .likeTable(new LikeTable("party", SqlLike.RIGHT))
 //                .likeTable(new LikeTable("person", SqlLike.RIGHT))
                 ;

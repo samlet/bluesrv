@@ -3,3 +3,7 @@ run program +FLAGS='':
 
 app program +FLAGS='':
     mvn compile exec:java -Dexec.mainClass="com.bluecc.bluesrv.{{program}}" -Dexec.args="{{FLAGS}}"
+
+bot:
+	mvn spring-boot:run -Dstart-class=com.bluecc.bluesrv.bot.BotApp
+
