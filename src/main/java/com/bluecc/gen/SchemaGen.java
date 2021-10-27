@@ -274,12 +274,17 @@ public class SchemaGen {
                         + f.getPropertyType() + ", "
                         + get_mappings().getFlinkTypeMapping(f.getType())
                 );
+                String beanType = f.getPropertyType();
+                if (beanType.equals("LocalDate")) {
+                    beanType = "Date";
+                }
                 table.getFields().add(GenTypes.SqlField.builder()
                         .name(f.getName().toLowerCase())
                         .flinkType(get_mappings().getFlinkTypeMapping(f.getType()))
                         .sqlType(f.getType())
                         .propertyName(f.getPropertyName())
                         .propertyType(f.getPropertyType())
+                        .beanType(beanType)
                         .build());
             });
             System.out.println();
@@ -296,13 +301,13 @@ public class SchemaGen {
 
             // write controllers
             if (codeTarget != null) {
-                String fileTarget=table.controllerName + ".java";
+                String fileTarget = table.controllerName + ".java";
                 writeCode(codeController, codeTarget, fileTarget);
             } else {
                 System.out.println(".. only show source code");
             }
             if (beanTarget != null) {
-                String fileTarget=table.entityName + ".java";
+                String fileTarget = table.entityName + ".java";
                 writeCode(codeBean, beanTarget, fileTarget);
             }
         });

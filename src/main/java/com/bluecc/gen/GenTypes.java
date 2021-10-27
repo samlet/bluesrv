@@ -29,6 +29,7 @@ public class GenTypes {
 
         String propertyName;
         String propertyType;
+        String beanType;
     }
 }
 
