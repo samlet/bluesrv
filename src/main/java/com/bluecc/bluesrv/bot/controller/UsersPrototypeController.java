@@ -10,6 +10,7 @@ import com.bluecc.bluesrv.common.AbstractController;
 import com.bluecc.bluesrv.common.PageData;
 import com.bluecc.bluesrv.common.PageQueryData;
 import com.bluecc.bluesrv.common.PageResultData;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,11 @@ import java.util.List;
  * @author samlet
  * @since 2021-10-17
  */
+@Slf4j
 @RestController
 @RequestMapping("/bot/users_proto")
 public class UsersPrototypeController extends AbstractController {
-    private static final Logger logger = LoggerFactory.getLogger(UsersPrototypeController.class);
+//    private static final Logger logger = LoggerFactory.getLogger(UsersPrototypeController.class);
 
     @Autowired
     private IUsersService usersService;
@@ -71,6 +73,7 @@ public class UsersPrototypeController extends AbstractController {
 
     @PostMapping("/query")
     public ResponseEntity<PageResultData<Users>> query(@RequestBody PageQueryData queryData) {
+        log.info("query with page size: {}", queryData.getPageSize());
         QueryWrapper<Users> wrapper = convertQueryWrapper(queryData);
 
         Page<Users> page = new Page<>(queryData.getPageNo(), queryData.getPageSize());

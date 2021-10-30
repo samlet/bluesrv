@@ -86,6 +86,9 @@ public class SchemaGen {
                 case "gmall":
                     gen = new GmallCodeGen();
                     break;
+                case "ssb":
+                    gen = new SsbCodeGen();
+                    break;
                 default:
                     throw new RuntimeException("No such module " + module);
             }

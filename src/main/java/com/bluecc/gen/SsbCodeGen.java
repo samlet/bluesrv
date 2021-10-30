@@ -1,9 +1,13 @@
 package com.bluecc.gen;
 
 import com.baomidou.mybatisplus.generator.AutoGenerator;
-import com.baomidou.mybatisplus.generator.config.*;
-import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
+import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
+import com.baomidou.mybatisplus.generator.config.GlobalConfig;
+import com.baomidou.mybatisplus.generator.config.PackageConfig;
+import com.baomidou.mybatisplus.generator.config.StrategyConfig;
+import com.baomidou.mybatisplus.generator.config.converts.ClickHouseTypeConvert;
 import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
+import com.baomidou.mybatisplus.generator.config.querys.ClickHouseQuery;
 import com.baomidou.mybatisplus.generator.config.querys.MySqlQuery;
 import com.baomidou.mybatisplus.generator.keywords.MySqlKeyWordsHandler;
 
@@ -12,28 +16,19 @@ import java.sql.SQLException;
 /**
  * $ just run gen.CodeGen
  */
-public class BotCodeGen implements ICodeGen {
+public class SsbCodeGen extends CodeGenBase {
     public final DataSourceConfig dataSourceConfig =
-            new DataSourceConfig.Builder("jdbc:mysql://127.0.0.1:3306/bot", "root", "root")
-                    .dbQuery(new MySqlQuery())
-                    .schema("mybatis-plus")
-                    .typeConvert(new MySqlTypeConvert())
+            new DataSourceConfig.Builder("jdbc:clickhouse://localhost:8123/default",
+                    "default",
+                    "")
+                    .dbQuery(new ClickHouseQuery())
+                    .schema("default")
+                    .typeConvert(new ClickHouseTypeConvert())
                     .keyWordsHandler(new MySqlKeyWordsHandler())
                     .build();
 
-    @Override
-    public  ConfigBuilder getConfigBuilder() {
-        ConfigBuilder conf=new ConfigBuilder(packageConfig().build(),
-                this.dataSourceConfig,
-                this.strategyConfig().build(),
-                this.templateConfig().build(),
-                this.globalConfig().build(),
-                null);
-        return conf;
-    }
-
     public static void main(String[] args) throws SQLException {
-        new BotCodeGen().gen();
+        new SsbCodeGen().gen();
         System.out.println("ok.");
     }
 
@@ -45,24 +40,19 @@ public class BotCodeGen implements ICodeGen {
 
     @Override
     public String moduleName() {
-        return "bot";
+        return "ssb";
     }
 
-    public AutoGenerator getAutoGenerator() {
-        AutoGenerator generator = new AutoGenerator(dataSourceConfig);
-        generator.strategy(strategyConfig().build());
-        generator.global(globalConfig().build());
-        generator.packageInfo(packageConfig().build());
-        return generator;
-    }
 
     /**
      * 策略配置
      */
     public StrategyConfig.Builder strategyConfig() {
         return new StrategyConfig.Builder()
-                .addInclude("hotel", "addresses",
-                        "restaurant", "users");
+                .addInclude("customer", "lineorder", "part", "supplier")
+//                .likeTable(new LikeTable("party", SqlLike.RIGHT))
+//                .likeTable(new LikeTable("person", SqlLike.RIGHT))
+                ;
     }
 
     /**
@@ -72,7 +62,7 @@ public class BotCodeGen implements ICodeGen {
         return new GlobalConfig.Builder()
 //                .fileOverride()
                 .enableSwagger()
-                .outputDir("/opt/gen")
+                .outputDir("/opt/gen/ssb")
                 .author("samlet")
                 .disableOpenDir();
     }
@@ -86,10 +76,9 @@ public class BotCodeGen implements ICodeGen {
                 .moduleName(moduleName());
     }
 
-    /**
-     * 模板配置
-     */
-    protected TemplateConfig.Builder templateConfig() {
-        return new TemplateConfig.Builder();
+    @Override
+    public DataSourceConfig getDataSourceConfig() {
+        return dataSourceConfig;
     }
+
 }
