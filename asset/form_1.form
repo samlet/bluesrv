@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "components": [
+    {
+      "label": "Text Field",
+      "type": "textfield",
+      "id": "Field_0jt6kv3",
+      "key": "field_1swpfh5"
+    },
+    {
+      "label": "Text Field",
+      "type": "textfield",
+      "id": "Field_1o8sghg",
+      "key": "field_1lwefds"
+    },
+    {
+      "label": "Number",
+      "type": "number",
+      "id": "Field_0z9njfv",
+      "key": "field_0e99qq5"
+    },
+    {
+      "label": "Checkbox",
+      "type": "checkbox",
+      "id": "Field_0fd0udx",
+      "key": "field_1txm581"
+    },
+    {
+      "values": [
+        {
+          "label": "First",
+          "value": "value"
+        },
+        {
+          "label": "Second",
+          "value": "value"
+        }
+      ],
+      "label": "Select a option",
+      "type": "select",
+      "id": "Field_1f5cye1",
+      "key": "field_0g47bfe"
+    }
+  ],
+  "type": "default",
+  "id": "Form_0cxbia1"
+}
