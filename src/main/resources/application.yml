@@ -15,7 +15,8 @@ spring:
       hikari:
         connection-test-query: SELECT 1
       # primary: master #设置默认的数据源或者数据源组,默认值即为master
-      primary: bot
+      # primary: bot
+      primary: gmall
       strict: false #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
       datasource:
         master:
@@ -36,6 +37,14 @@ spring:
         bot:
           driverClassName: com.mysql.cj.jdbc.Driver
           url: jdbc:mysql://localhost:3306/bot?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf8&connectTimeout=3000
+          username: "root"
+          password: "root"
+          hikari:
+            max-pool-size: 10
+            min-idle: 5
+        gmall:
+          driverClassName: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://localhost:3306/gmall?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf8&connectTimeout=3000
           username: "root"
           password: "root"
           hikari:

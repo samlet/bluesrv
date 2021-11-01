@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<clickhouse-native-jdbc.version>2.5.6</clickhouse-native-jdbc.version>
+		<version.camunda>7.16.0</version.camunda>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -131,6 +132,41 @@
 			<groupId>com.github.housepower</groupId>
 			<artifactId>clickhouse-native-jdbc-shaded</artifactId>
 			<version>${clickhouse-native-jdbc.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.camunda.bpm</groupId>
+			<artifactId>camunda-external-task-client</artifactId>
+			<version>${version.camunda}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.camunda.bpm.model</groupId>
+			<artifactId>camunda-bpmn-model</artifactId>
+			<version>${version.camunda}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.slf4j</groupId>-->
+<!--			<artifactId>slf4j-simple</artifactId>-->
+<!--			<version>1.6.1</version>-->
+<!--		</dependency>-->
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.21.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

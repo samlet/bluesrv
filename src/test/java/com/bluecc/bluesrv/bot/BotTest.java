@@ -65,6 +65,17 @@ public class BotTest {
     }
 
     @Test
+    void testQueryAndUpdate(){
+        QueryWrapper<Users> wrapper = new QueryWrapper<>();
+//        wrapper.eq("name", "samlet");
+        wrapper.eq("id", 1);
+        Users u=usersMapper.selectOne(wrapper);
+        System.out.println(u);
+        u.setFullname("Has a new name");
+        usersMapper.updateById(u);
+    }
+
+    @Test
     void testUsersService(){
         Users user=usersService.getById(1);
         System.out.println(user);
