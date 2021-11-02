@@ -7,3 +7,5 @@ app program +FLAGS='':
 bot:
 	mvn spring-boot:run -Dstart-class=com.bluecc.bluesrv.bot.BotApp
 
+workflows:
+    ls -alh /opt/asset/workflow/blues
