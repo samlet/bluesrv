@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_13w7vf9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="loan-approval" name="Loan approval" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="start">
+      <bpmn:outgoing>Flow_0yf5d7a</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0bkk6zh" name="end">
+      <bpmn:incoming>Flow_16yv83v</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0yf5d7a" sourceRef="StartEvent_1" targetRef="Activity_1sba25h" />
+    <bpmn:sequenceFlow id="Flow_16yv83v" sourceRef="Activity_1sba25h" targetRef="Event_0bkk6zh" />
+    <bpmn:serviceTask id="Activity_1sba25h" name="检查申请单" camunda:type="external" camunda:topic="place-order">
+      <bpmn:incoming>Flow_0yf5d7a</bpmn:incoming>
+      <bpmn:outgoing>Flow_16yv83v</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="loan-approval">
+      <bpmndi:BPMNEdge id="Flow_16yv83v_di" bpmnElement="Flow_16yv83v">
+        <di:waypoint x="384" y="139" />
+        <di:waypoint x="452" y="139" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yf5d7a_di" bpmnElement="Flow_0yf5d7a">
+        <di:waypoint x="215" y="139" />
+        <di:waypoint x="284" y="139" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_180kugc_di" bpmnElement="Activity_1sba25h">
+        <dc:Bounds x="284" y="99" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="121" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="187" y="164" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0bkk6zh_di" bpmnElement="Event_0bkk6zh">
+        <dc:Bounds x="452" y="121" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="461" y="164" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

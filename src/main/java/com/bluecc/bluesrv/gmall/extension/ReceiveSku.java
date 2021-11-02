@@ -18,6 +18,7 @@ public class ReceiveSku implements IProcessor<ReceiveSku.ReceiveSkuData, WareSku
     @Autowired
     private WareSkuMapper wareSkuMapper;
     Faker usFaker = new Faker(new Locale("en-US"));
+
     @Override
     public WareSku process(ReceiveSkuData input) {
         QueryWrapper<WareSku> wrapper = new QueryWrapper<>();

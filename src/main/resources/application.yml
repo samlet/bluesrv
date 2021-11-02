@@ -53,3 +53,13 @@ spring:
 
 # 业务日期
 mock.date: 2020-12-21
+
+camunda.bpm:
+  admin-user:
+    id: demo
+    password: demo
+    firstName: Demo
+  filter:
+    create: All tasks
+  webapp:
+    index-redirect-enabled: true

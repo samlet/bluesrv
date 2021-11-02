@@ -149,7 +149,6 @@
 			<artifactId>camunda-spin-dataformat-all</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>

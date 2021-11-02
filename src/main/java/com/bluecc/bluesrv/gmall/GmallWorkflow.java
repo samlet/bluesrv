@@ -8,6 +8,7 @@ import org.camunda.bpm.client.ExternalTaskClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -35,7 +36,11 @@ public class GmallWorkflow {
                     log.info("Update result: {}", rec);
 
                     // 完成任务
-                    externalTaskService.complete(externalTask);
+//                    externalTaskService.complete(externalTask);
+                    Map<String, Object> variables = new HashMap<String, Object>();
+                    variables.put("approved", true);
+                    externalTaskService.complete(externalTask, variables);
+
                 })
                 .open();
     }
