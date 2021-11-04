@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
  * <p>
  * $ just run gen.SchemaGen -m bot -c /tmp/xxxx
  * $ just run gen.SchemaGen -m ofbiz -b /tmp/xxx
+ * $ just run gen.SchemaGen --module ofbiz -w  # 写到main/init_sql/ofbiz.sql中
  */
 public class SchemaGen {
     // Modules, split the name list by comma
@@ -235,7 +236,8 @@ public class SchemaGen {
                 System.out.println(renderedTemplate);
                 System.out.println();
 
-                FileWriter writer = new FileWriter(dir + tableInfo.getName() + ".sql");
+                FileWriter writer = new FileWriter(dir
+                        + tableInfo.getName().toLowerCase() + ".sql");
                 IOUtils.write(renderedTemplate, writer);
                 writer.close();
             }
@@ -257,7 +259,8 @@ public class SchemaGen {
 
     Map<Tuple2<String, String>, String> templateRepos = Maps.newHashMap();
 
-    private void buildPipeline(ICodeGen gen, List<TableInfo> tableInfoList, Jinjava jinjava) {
+    private void buildPipeline(ICodeGen gen, List<TableInfo> tableInfoList, Jinjava jinjava) throws IOException {
+        StringBuilder sqlCreator=new StringBuilder();
         tableInfoList.forEach(t -> {
 //            GenTypes.SqlTable table = new GenTypes.SqlTable();
             GenTypes.SqlTable table = GenTypes.SqlTable.builder()
@@ -332,6 +335,8 @@ public class SchemaGen {
             String codeMysql = buildWithTemplate("mysql", "mysql_source.j2",
                     jinjava, table, context);
 
+            sqlCreator.append(codeMysql);
+
             // write controllers
             if (codeTarget != null) {
                 String fileTarget = table.controllerName + ".java";
@@ -344,6 +349,12 @@ public class SchemaGen {
                 writeCode(codeBean, beanTarget, fileTarget);
             }
         });
+
+        if(writeScriptModule){
+            FileWriter writer = new FileWriter("./maintain/init_sql/"+gen.moduleName()+".sql");
+            IOUtils.write(sqlCreator.toString(), writer);
+            writer.close();
+        }
     }
 
     private void addTablePk(GenTypes.SqlTable table) {

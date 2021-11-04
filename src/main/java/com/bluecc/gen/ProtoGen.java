@@ -13,12 +13,16 @@ import java.util.Collections;
 
 import static com.bluecc.gen.OfbizCodeGen.entityList;
 
+/*
+$ just run gen.ProtoGen
+ */
 public class ProtoGen {
     public static void main(String[] args) {
         gen();
+        System.exit(0);
     }
     public static void gen() {
-        FastAutoGenerator.create("jdbc:mysql://127.0.0.1:3306/ofbiz",
+        FastAutoGenerator.create("jdbc:mysql://127.0.0.1:3306/order_proto",
                         "root", "root")
                 .globalConfig(builder -> {
                     builder.author("samlet") // 设置作者

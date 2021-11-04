@@ -69,6 +69,8 @@ public class OfbizCodeGen extends CodeGenBase {
                         "PartyRole", "PartyStatus", "PartyGeoPoint",
                         // product
                         "Product",
+                        // order
+                        "OrderRole", "OrderItemShipGroup",
                         // shipment
                         "Shipment", "ShipmentItem", "ItemIssuance"
                 ).stream()

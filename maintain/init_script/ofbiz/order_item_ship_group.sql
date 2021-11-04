@@ -1,0 +1,27 @@
+create table if not exists ORDER_ITEM_SHIP_GROUP(
+    ORDER_ID String,
+    SHIP_GROUP_SEQ_ID String,
+    SHIPMENT_METHOD_TYPE_ID String,
+    SUPPLIER_PARTY_ID String,
+    SUPPLIER_AGREEMENT_ID String,
+    VENDOR_PARTY_ID String,
+    CARRIER_PARTY_ID String,
+    CARRIER_ROLE_TYPE_ID String,
+    FACILITY_ID String,
+    CONTACT_MECH_ID String,
+    TELECOM_CONTACT_MECH_ID String,
+    TRACKING_NUMBER String,
+    SHIPPING_INSTRUCTIONS String,
+    MAY_SPLIT String,
+    GIFT_MESSAGE String,
+    IS_GIFT String,
+    SHIP_AFTER_DATE Datetime,
+    SHIP_BY_DATE Datetime,
+    ESTIMATED_SHIP_DATE Datetime,
+    ESTIMATED_DELIVERY_DATE Datetime,
+    LAST_UPDATED_STAMP Datetime,
+    LAST_UPDATED_TX_STAMP Datetime,
+    CREATED_STAMP Datetime,
+    CREATED_TX_STAMP Datetime) engine=MergeTree
+partition by toYYYYMMDD(create_time)
+primary key (id) order by (id);
