@@ -18,6 +18,7 @@ public class GenTypes {
         String serviceVar;
         String controllerName;
         List<SqlField> fields;
+        String uniqueKey;
     }
 
     @Data
@@ -30,6 +31,7 @@ public class GenTypes {
         String propertyName;
         String propertyType;
         String beanType;
+        boolean nullable;
     }
 }
 

@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS `{{table.name}}`;
+CREATE TABLE {{table.name}} (
+    {% for f in table.fields -%}
+    {{f.name}} {{f.sqlType}} {% if not f.nullable %}NOT NULL{% endif %},
+    {% endfor %}
+    PRIMARY KEY (`id`),
+    UNIQUE KEY unique_{{table.name}} ({{table.uniqueKey}})
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+

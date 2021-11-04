@@ -1,5 +1,6 @@
 package com.bluecc.gen;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.enums.SqlLike;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
@@ -10,8 +11,12 @@ import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
 import com.baomidou.mybatisplus.generator.config.po.LikeTable;
 import com.baomidou.mybatisplus.generator.config.querys.MySqlQuery;
 import com.baomidou.mybatisplus.generator.keywords.MySqlKeyWordsHandler;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Sets;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * $ just run gen.CodeGen
@@ -47,13 +52,28 @@ public class OfbizCodeGen extends CodeGenBase {
      */
     public StrategyConfig.Builder strategyConfig() {
         return new StrategyConfig.Builder()
-                .addInclude("party", "person", "product", "inventory_item", "product_feature",
-                        "product_feature_price", "product_feature_type", "product_geo",
-                        "product_feature_appl", "product_facility",
-                        "rate_amount", "empl_position", "party_status")
+                .addInclude(entityList())
+//                .addInclude("party", "person", "product", "inventory_item", "product_feature",
+//                        "product_feature_price", "product_feature_type", "product_geo",
+//                        "product_feature_appl", "product_facility",
+//                        "rate_amount", "empl_position", "party_status")
 //                .likeTable(new LikeTable("party", SqlLike.RIGHT))
 //                .likeTable(new LikeTable("person", SqlLike.RIGHT))
                 ;
+    }
+
+    static List<String> entityList() {
+        return Sets.newHashSet(
+                        // party
+                        "Party", "Person", "PartyGroup", "UserLogin",
+                        "PartyRole", "PartyStatus", "PartyGeoPoint",
+                        // product
+                        "Product",
+                        // shipment
+                        "Shipment", "ShipmentItem", "ItemIssuance"
+                ).stream()
+                .map(e -> Util.toSnakecase(e))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -61,9 +81,10 @@ public class OfbizCodeGen extends CodeGenBase {
      */
     public GlobalConfig.Builder globalConfig() {
         return new GlobalConfig.Builder()
-//                .fileOverride()
+                .fileOverride()
                 .enableSwagger()
-                .outputDir("/opt/gen/ofbiz")
+//                .outputDir("/opt/gen/ofbiz")
+                .outputDir("/opt/asset/order_proto/src/main/java")
                 .author("samlet")
                 .disableOpenDir();
     }

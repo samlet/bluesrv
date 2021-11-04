@@ -14,6 +14,10 @@ public class Util {
         return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str);
     }
 
+    public static String toSnakecase(String str){
+        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, str);
+    }
+
     public static String toVarName(String str){
         return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, str);
     }

@@ -52,14 +52,19 @@ import java.util.stream.Collectors;
  * $ just run gen.SchemaGen -m ofbiz -b /tmp/xxx
  */
 public class SchemaGen {
+    // Modules, split the name list by comma
     @Parameter(names = {"--module", "-m"})
     List<String> modules = new ArrayList<>();
+    // Launch the schemas service, listen on port 1080
     @Parameter(names = {"--service", "-s"})
     boolean service;
+    // Write sql script(clickhouse) to sub-dir maintain/init_script
     @Parameter(names = {"--write", "-w"})
     boolean writeScriptModule;
+    // Write controller code to target-dir
     @Parameter(names = {"--codeTarget", "-c"})
     String codeTarget;
+    // Write bean code(lombok) to target-dir
     @Parameter(names = {"--beanTarget", "-b"})
     String beanTarget;
 
@@ -269,6 +274,14 @@ public class SchemaGen {
             System.out.format("service name: %s, %s\n", t.getServiceName(),
                     Util.toVarName(t.getEntityName() + "Service"));
             System.out.format("controller name: %s\n", t.getControllerName());
+            List<String> pks = getTablePks(t);
+            if (pks.size() > 1) {
+                addTablePk(table);
+                table.setUniqueKey(String.join(", ", pks));
+            }else{
+                table.setUniqueKey("nss");
+            }
+
             t.getFields().forEach(f -> {
                 System.out.println("\t"
                         + f.getPropertyName() + ": "
@@ -281,15 +294,30 @@ public class SchemaGen {
                 if (beanType.equals("LocalDate")) {
                     beanType = "Date";
                 }
-                table.getFields().add(GenTypes.SqlField.builder()
-                        .name(f.getName().toLowerCase())
-                        .flinkType(get_mappings().getFlinkTypeMapping(f.getType()))
-                        .sqlType(f.getType())
-                        .propertyName(f.getPropertyName())
-                        .propertyType(f.getPropertyType())
-                        .beanType(beanType)
-                        .build());
+
+                String fldName=f.getName().toLowerCase();
+                // is primary key
+                if (f.isKeyFlag() && pks.size() == 1) {
+                    // replace old pk with 'id'
+                    addTablePk(table);
+                    addTableNss(table);
+                } else if (fldName.equals("last_updated_tx_stamp")
+                        || fldName.equals("created_tx_stamp")) {
+                    // skip the field
+
+                } else {
+                    table.getFields().add(GenTypes.SqlField.builder()
+                            .name(fldName)
+                            .flinkType(get_mappings().getFlinkTypeMapping(f.getType()))
+                            .sqlType(f.getType())
+                            .propertyName(f.getPropertyName())
+                            .propertyType(f.getPropertyType())
+                            .beanType(beanType)
+                            .nullable(f.getMetaInfo().isNullable())
+                            .build());
+                }
             });
+
             System.out.println();
 
             Map<String, Object> context = Maps.newHashMap();
@@ -300,6 +328,8 @@ public class SchemaGen {
             String codeController = buildWithTemplate("rest", "rest_source.j2",
                     jinjava, table, context);
             String codeBean = buildWithTemplate("bean", "bean_source.j2",
+                    jinjava, table, context);
+            String codeMysql = buildWithTemplate("mysql", "mysql_source.j2",
                     jinjava, table, context);
 
             // write controllers
@@ -314,6 +344,34 @@ public class SchemaGen {
                 writeCode(codeBean, beanTarget, fileTarget);
             }
         });
+    }
+
+    private void addTablePk(GenTypes.SqlTable table) {
+        table.getFields().add(GenTypes.SqlField.builder()
+                .name("id")
+                .flinkType(get_mappings().getFlinkTypeMapping("BIGINT"))
+                .sqlType("bigint(20)")
+                .propertyName("id")
+                .propertyType("Long")
+                .beanType("Long")
+                .build());
+    }
+
+    private void addTableNss(GenTypes.SqlTable table) {
+        table.getFields().add(GenTypes.SqlField.builder()
+                .name("nss")
+                .flinkType(get_mappings().getFlinkTypeMapping("STRING"))
+                .sqlType("varchar(20)")
+                .propertyName("nss")
+                .propertyType("String")
+                .beanType("String")
+                .build());
+    }
+
+    private List<String> getTablePks(TableInfo t) {
+        return t.getFields().stream().filter(f -> f.isKeyFlag())
+                .map(f -> f.getName().toLowerCase())
+                .collect(Collectors.toList());
     }
 
     private void writeCode(String codeController, String rootDir, String fileTarget) {

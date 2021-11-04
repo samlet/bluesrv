@@ -9,3 +9,5 @@ bot:
 
 workflows:
     ls -alh /opt/asset/workflow/blues
+rabbit-admin:
+    open http://localhost:15672/#/exchanges
