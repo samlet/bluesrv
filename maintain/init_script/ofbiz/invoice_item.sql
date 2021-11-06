@@ -1,0 +1,26 @@
+create table if not exists INVOICE_ITEM(
+    INVOICE_ID String,
+    INVOICE_ITEM_SEQ_ID String,
+    INVOICE_ITEM_TYPE_ID String,
+    OVERRIDE_GL_ACCOUNT_ID String,
+    OVERRIDE_ORG_PARTY_ID String,
+    INVENTORY_ITEM_ID String,
+    PRODUCT_ID String,
+    PRODUCT_FEATURE_ID String,
+    PARENT_INVOICE_ID String,
+    PARENT_INVOICE_ITEM_SEQ_ID String,
+    UOM_ID String,
+    TAXABLE_FLAG String,
+    QUANTITY Decimal(16,2) ,
+    AMOUNT Decimal(16,2) ,
+    DESCRIPTION String,
+    TAX_AUTH_PARTY_ID String,
+    TAX_AUTH_GEO_ID String,
+    TAX_AUTHORITY_RATE_SEQ_ID String,
+    SALES_OPPORTUNITY_ID String,
+    LAST_UPDATED_STAMP Datetime,
+    LAST_UPDATED_TX_STAMP Datetime,
+    CREATED_STAMP Datetime,
+    CREATED_TX_STAMP Datetime) engine=MergeTree
+partition by toYYYYMMDD(create_time)
+primary key (id) order by (id);

@@ -1,0 +1,27 @@
+create table if not exists SUPPLIER_PRODUCT(
+    PRODUCT_ID String,
+    PARTY_ID String,
+    AVAILABLE_FROM_DATE Datetime,
+    AVAILABLE_THRU_DATE Datetime,
+    SUPPLIER_PREF_ORDER_ID String,
+    SUPPLIER_RATING_TYPE_ID String,
+    STANDARD_LEAD_TIME_DAYS Decimal(16,2) ,
+    MINIMUM_ORDER_QUANTITY Decimal(16,2) ,
+    ORDER_QTY_INCREMENTS Decimal(16,2) ,
+    UNITS_INCLUDED Decimal(16,2) ,
+    QUANTITY_UOM_ID String,
+    AGREEMENT_ID String,
+    AGREEMENT_ITEM_SEQ_ID String,
+    LAST_PRICE Decimal(16,2) ,
+    SHIPPING_PRICE Decimal(16,2) ,
+    CURRENCY_UOM_ID String,
+    SUPPLIER_PRODUCT_NAME String,
+    SUPPLIER_PRODUCT_ID String,
+    CAN_DROP_SHIP String,
+    COMMENTS String,
+    LAST_UPDATED_STAMP Datetime,
+    LAST_UPDATED_TX_STAMP Datetime,
+    CREATED_STAMP Datetime,
+    CREATED_TX_STAMP Datetime) engine=MergeTree
+partition by toYYYYMMDD(create_time)
+primary key (id) order by (id);

@@ -1,0 +1,28 @@
+create table if not exists PRODUCT_PRICE(
+    PRODUCT_ID String,
+    PRODUCT_PRICE_TYPE_ID String,
+    PRODUCT_PRICE_PURPOSE_ID String,
+    CURRENCY_UOM_ID String,
+    PRODUCT_STORE_GROUP_ID String,
+    FROM_DATE Datetime,
+    THRU_DATE Datetime,
+    PRICE Decimal(16,2) ,
+    TERM_UOM_ID String,
+    CUSTOM_PRICE_CALC_SERVICE String,
+    PRICE_WITHOUT_TAX Decimal(16,2) ,
+    PRICE_WITH_TAX Decimal(16,2) ,
+    TAX_AMOUNT Decimal(16,2) ,
+    TAX_PERCENTAGE Decimal(16,2) ,
+    TAX_AUTH_PARTY_ID String,
+    TAX_AUTH_GEO_ID String,
+    TAX_IN_PRICE String,
+    CREATED_DATE Datetime,
+    CREATED_BY_USER_LOGIN String,
+    LAST_MODIFIED_DATE Datetime,
+    LAST_MODIFIED_BY_USER_LOGIN String,
+    LAST_UPDATED_STAMP Datetime,
+    LAST_UPDATED_TX_STAMP Datetime,
+    CREATED_STAMP Datetime,
+    CREATED_TX_STAMP Datetime) engine=MergeTree
+partition by toYYYYMMDD(create_time)
+primary key (id) order by (id);

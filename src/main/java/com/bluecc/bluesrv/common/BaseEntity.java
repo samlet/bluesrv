@@ -8,7 +8,5 @@ import java.time.LocalDateTime;
 @Data
 public class BaseEntity implements Serializable {
     protected LocalDateTime lastUpdatedStamp;
-    protected LocalDateTime lastUpdatedTxStamp;
     protected LocalDateTime createdStamp;
-    protected LocalDateTime createdTxStamp;
 }

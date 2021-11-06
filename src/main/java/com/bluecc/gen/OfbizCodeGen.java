@@ -62,17 +62,28 @@ public class OfbizCodeGen extends CodeGenBase {
                 ;
     }
 
+    static String dataFile = "dataset/OrderDemoData.xml";
+
     static List<String> entityList() {
+        return SeedReader.collectEntityNames(dataFile).stream()
+                .map(e -> Util.toSnakecase(e))
+                .collect(Collectors.toList());
+    }
+
+    static List<String> stuffEntityList() {
         return Sets.newHashSet(
                         // party
                         "Party", "Person", "PartyGroup", "UserLogin",
                         "PartyRole", "PartyStatus", "PartyGeoPoint",
+                        "ContactMech", "PostalAddress", "PartyContactMech",
                         // product
                         "Product",
                         // order
-                        "OrderRole", "OrderItemShipGroup",
+                        "OrderRole", "OrderItemShipGroup", "OrderContactMech", "OrderStatus",
+                        // inventory
+                        "InventoryItem", "ShipmentReceipt", "InventoryItemDetail",
                         // shipment
-                        "Shipment", "ShipmentItem", "ItemIssuance"
+                        "Shipment", "ShipmentItem", "ItemIssuance", "ShipmentRouteSegment"
                 ).stream()
                 .map(e -> Util.toSnakecase(e))
                 .collect(Collectors.toList());

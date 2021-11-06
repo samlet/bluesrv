@@ -19,6 +19,8 @@ public class GenTypes {
         String controllerName;
         List<SqlField> fields;
         String uniqueKey;
+        boolean combine;
+        String pk;
     }
 
     @Data

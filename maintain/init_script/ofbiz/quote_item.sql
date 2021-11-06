@@ -1,0 +1,28 @@
+create table if not exists QUOTE_ITEM(
+    QUOTE_ID String,
+    QUOTE_ITEM_SEQ_ID String,
+    PRODUCT_ID String,
+    PRODUCT_FEATURE_ID String,
+    DELIVERABLE_TYPE_ID String,
+    SKILL_TYPE_ID String,
+    UOM_ID String,
+    WORK_EFFORT_ID String,
+    CUST_REQUEST_ID String,
+    CUST_REQUEST_ITEM_SEQ_ID String,
+    QUANTITY Decimal(16,2) ,
+    SELECTED_AMOUNT Decimal(16,2) ,
+    QUOTE_UNIT_PRICE Decimal(16,2) ,
+    RESERV_START Datetime,
+    RESERV_LENGTH Decimal(16,2) ,
+    RESERV_PERSONS Decimal(16,2) ,
+    CONFIG_ID String,
+    ESTIMATED_DELIVERY_DATE Datetime,
+    COMMENTS String,
+    IS_PROMO String,
+    LEAD_TIME_DAYS Decimal(16,2) ,
+    LAST_UPDATED_STAMP Datetime,
+    LAST_UPDATED_TX_STAMP Datetime,
+    CREATED_STAMP Datetime,
+    CREATED_TX_STAMP Datetime) engine=MergeTree
+partition by toYYYYMMDD(create_time)
+primary key (id) order by (id);

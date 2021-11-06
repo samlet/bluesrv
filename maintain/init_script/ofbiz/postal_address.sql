@@ -1,0 +1,25 @@
+create table if not exists POSTAL_ADDRESS(
+    CONTACT_MECH_ID String,
+    TO_NAME String,
+    ATTN_NAME String,
+    ADDRESS1 String,
+    ADDRESS2 String,
+    HOUSE_NUMBER Decimal(16,2) ,
+    HOUSE_NUMBER_EXT String,
+    DIRECTIONS String,
+    CITY String,
+    CITY_GEO_ID String,
+    POSTAL_CODE String,
+    POSTAL_CODE_EXT String,
+    COUNTRY_GEO_ID String,
+    STATE_PROVINCE_GEO_ID String,
+    COUNTY_GEO_ID String,
+    MUNICIPALITY_GEO_ID String,
+    POSTAL_CODE_GEO_ID String,
+    GEO_POINT_ID String,
+    LAST_UPDATED_STAMP Datetime,
+    LAST_UPDATED_TX_STAMP Datetime,
+    CREATED_STAMP Datetime,
+    CREATED_TX_STAMP Datetime) engine=MergeTree
+partition by toYYYYMMDD(create_time)
+primary key (id) order by (id);

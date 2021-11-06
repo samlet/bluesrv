@@ -1,0 +1,46 @@
+package com.bluecc.bluesrv.common;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+public enum {{e.typeName}} {
+    {% for f in e.types -%}
+    {{f.typeId}}("{{f.typeId}}", "{{f.parentTypeId}}", "{{f.description}}"){% if not loop.last %},{% endif %}
+    {% endfor %};
+
+    private static final Map<String, {{e.typeName}}> BY_TYPE = new HashMap<>();
+    private static final Multimap<String, {{e.typeName}}> BY_PARENT_TYPE = ArrayListMultimap.create();
+
+    static {
+        for ({{e.typeName}} e : values()) {
+            BY_TYPE.put(e.typeId, e);
+            BY_PARENT_TYPE.put(e.parentType, e);
+        }
+    }
+
+    public final String typeId;
+    public final String parentType;
+    public final String description;
+
+    private {{e.typeName}}(String typeId, String parentType, String description) {
+        this.typeId = typeId;
+        this.parentType = parentType;
+        this.description = description;
+    }
+
+    public static {{e.typeName}} valueOfType(String typeId) {
+        return BY_TYPE.get(typeId);
+    }
+
+    public static Collection<{{e.typeName}}> childTypes(String typeId) {
+        return BY_PARENT_TYPE.get(typeId);
+    }
+    public Collection<{{e.typeName}}> childTypes(){
+        return childTypes(this.typeId);
+    }
+}
+

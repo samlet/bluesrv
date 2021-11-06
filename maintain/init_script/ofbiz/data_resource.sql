@@ -1,0 +1,26 @@
+create table if not exists DATA_RESOURCE(
+    DATA_RESOURCE_ID String,
+    DATA_RESOURCE_TYPE_ID String,
+    DATA_TEMPLATE_TYPE_ID String,
+    DATA_CATEGORY_ID String,
+    DATA_SOURCE_ID String,
+    STATUS_ID String,
+    DATA_RESOURCE_NAME String,
+    LOCALE_STRING String,
+    MIME_TYPE_ID String,
+    CHARACTER_SET_ID String,
+    OBJECT_INFO String,
+    SURVEY_ID String,
+    SURVEY_RESPONSE_ID String,
+    RELATED_DETAIL_ID String,
+    IS_PUBLIC String,
+    CREATED_DATE Datetime,
+    CREATED_BY_USER_LOGIN String,
+    LAST_MODIFIED_DATE Datetime,
+    LAST_MODIFIED_BY_USER_LOGIN String,
+    LAST_UPDATED_STAMP Datetime,
+    LAST_UPDATED_TX_STAMP Datetime,
+    CREATED_STAMP Datetime,
+    CREATED_TX_STAMP Datetime) engine=MergeTree
+partition by toYYYYMMDD(create_time)
+primary key (id) order by (id);

@@ -11,6 +11,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.hubspot.jinjava.Jinjava;
@@ -24,7 +25,6 @@ import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.server.annotation.Default;
 import com.linecorp.armeria.server.annotation.Get;
 import com.linecorp.armeria.server.annotation.Param;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,6 +36,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -258,9 +259,10 @@ public class SchemaGen {
     }
 
     Map<Tuple2<String, String>, String> templateRepos = Maps.newHashMap();
+    Set<String> ignoreFields = Sets.newHashSet("last_updated_tx_stamp", "created_tx_stamp");
 
     private void buildPipeline(ICodeGen gen, List<TableInfo> tableInfoList, Jinjava jinjava) throws IOException {
-        StringBuilder sqlCreator=new StringBuilder();
+        StringBuilder sqlCreator = new StringBuilder();
         tableInfoList.forEach(t -> {
 //            GenTypes.SqlTable table = new GenTypes.SqlTable();
             GenTypes.SqlTable table = GenTypes.SqlTable.builder()
@@ -279,10 +281,12 @@ public class SchemaGen {
             System.out.format("controller name: %s\n", t.getControllerName());
             List<String> pks = getTablePks(t);
             if (pks.size() > 1) {
-                addTablePk(table);
+                addTableStringPk(table);
                 table.setUniqueKey(String.join(", ", pks));
-            }else{
-                table.setUniqueKey("nss");
+                table.setCombine(true);
+                table.setPk("id");
+            } else {
+                table.setCombine(false);
             }
 
             t.getFields().forEach(f -> {
@@ -298,17 +302,15 @@ public class SchemaGen {
                     beanType = "Date";
                 }
 
-                String fldName=f.getName().toLowerCase();
+                String fldName = f.getName().toLowerCase();
                 // is primary key
                 if (f.isKeyFlag() && pks.size() == 1) {
                     // replace old pk with 'id'
-                    addTablePk(table);
-                    addTableNss(table);
-                } else if (fldName.equals("last_updated_tx_stamp")
-                        || fldName.equals("created_tx_stamp")) {
-                    // skip the field
+//                    addTableStringPk(table);
+                    table.setPk(fldName);
+                }
 
-                } else {
+                if (!ignoreFields.contains(fldName)) {
                     table.getFields().add(GenTypes.SqlField.builder()
                             .name(fldName)
                             .flinkType(get_mappings().getFlinkTypeMapping(f.getType()))
@@ -350,14 +352,14 @@ public class SchemaGen {
             }
         });
 
-        if(writeScriptModule){
-            FileWriter writer = new FileWriter("./maintain/init_sql/"+gen.moduleName()+".sql");
+        if (writeScriptModule) {
+            FileWriter writer = new FileWriter("./maintain/init_sql/" + gen.moduleName() + ".sql");
             IOUtils.write(sqlCreator.toString(), writer);
             writer.close();
         }
     }
 
-    private void addTablePk(GenTypes.SqlTable table) {
+    private void addTableIntPk(GenTypes.SqlTable table) {
         table.getFields().add(GenTypes.SqlField.builder()
                 .name("id")
                 .flinkType(get_mappings().getFlinkTypeMapping("BIGINT"))
@@ -368,12 +370,12 @@ public class SchemaGen {
                 .build());
     }
 
-    private void addTableNss(GenTypes.SqlTable table) {
+    private void addTableStringPk(GenTypes.SqlTable table) {
         table.getFields().add(GenTypes.SqlField.builder()
-                .name("nss")
+                .name("id")
                 .flinkType(get_mappings().getFlinkTypeMapping("STRING"))
                 .sqlType("varchar(20)")
-                .propertyName("nss")
+                .propertyName("id")
                 .propertyType("String")
                 .beanType("String")
                 .build());

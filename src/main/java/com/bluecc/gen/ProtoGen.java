@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.config.TemplateType;
+import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.fill.Column;
 import com.baomidou.mybatisplus.generator.fill.Property;
 import com.bluecc.bluesrv.common.BaseEntity;
@@ -21,6 +22,7 @@ public class ProtoGen {
         gen();
         System.exit(0);
     }
+
     public static void gen() {
         FastAutoGenerator.create("jdbc:mysql://127.0.0.1:3306/order_proto",
                         "root", "root")
@@ -29,6 +31,7 @@ public class ProtoGen {
                             .enableSwagger() // 开启 swagger 模式
                             .fileOverride() // 覆盖已生成文件
                             .disableOpenDir()
+//                            .dateType(DateType.ONLY_DATE)
                             .outputDir("/opt/asset/order_proto/src/main/java"); // 指定输出目录
                 })
                 .packageConfig(builder -> {
