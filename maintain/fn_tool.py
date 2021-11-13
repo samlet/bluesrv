@@ -6,11 +6,14 @@ import sys
 
 def receive_topic(topic: str, print_value=False):
     from kafka import KafkaConsumer
+    from termcolor import colored
     consumer = KafkaConsumer(topic)
     try:
         for msg in consumer:
             if print_value:
-                print(msg.value.decode("utf-8"))
+                print("☑️ ", colored(msg.topic, 'yellow'))
+                cnt=msg.value.decode("utf-8")
+                print(colored(cnt, "cyan"))
             else:
                 print(msg)
     except KeyboardInterrupt:
