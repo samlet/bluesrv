@@ -2,22 +2,6 @@ import random
 
 from feeder import Publisher
 import faust
-import sys
-
-def receive_topic(topic: str, print_value=False):
-    from kafka import KafkaConsumer
-    from termcolor import colored
-    consumer = KafkaConsumer(topic)
-    try:
-        for msg in consumer:
-            if print_value:
-                print("☑️ ", colored(msg.topic, 'yellow'))
-                cnt=msg.value.decode("utf-8")
-                print(colored(cnt, "cyan"))
-            else:
-                print(msg)
-    except KeyboardInterrupt:
-        sys.exit()
 
 class Point(faust.Record, serializer='json'):
     x: int
@@ -34,6 +18,7 @@ class Fn(object):
         :param topic:
         :return:
         """
+        from helpers import receive_topic
         receive_topic(topic)
 
     def send_test_ev(self):

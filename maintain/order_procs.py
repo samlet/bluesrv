@@ -3,38 +3,19 @@ import time
 from dataclasses import dataclass, field
 
 from feeder import Publisher
-from fn_tool import receive_topic
+from helpers import receive_topic, InstanceConf, ReceiverThread, instance_confs
 from termcolor import colored
 import threading
+import logging
 
-@dataclass
-class InstanceConf:
-    in_topic: str = field(default="bluecc-in")
-    out_topic: str = field(default="bluecc-out")
-
-
-instance_confs = {
-    "default": InstanceConf(
-        in_topic="bluecc-in",
-        out_topic="bluecc-out"
-    )
-}
-
-class ReceiverThread(threading.Thread):
-    def __init__(self, conf):
-        super().__init__()
-        self.conf=conf
-
-    def run(self):
-        receive_topic(self.conf.out_topic, True)
-
+logger = logging.getLogger(__name__)
 
 class OrderProcs(object):
     def __init__(self):
         self.publisher = Publisher()
 
     def boot_consumer(self, conf: InstanceConf):
-        print(".. config consumer")
+        logger.info(".. config consumer")
         ReceiverThread(conf).start()
         time.sleep(0.5)
 
@@ -46,7 +27,7 @@ class OrderProcs(object):
         conf = instance_confs[conf_name]
         self.boot_consumer(conf)
 
-        print(".. send request")
+        logger.info(".. send request")
         self.publisher.publish_with_headers(
             conf.in_topic,
             b"salesOrder: verbose",
@@ -57,36 +38,43 @@ class OrderProcs(object):
         print(colored(".. wait response", "green", attrs=["reverse"]))
         # receive_topic(conf.out_topic, True)
 
-    def list_order(self, conf_name='default'):
+    def list_order(self, order_id="WSCO10112", conf_name='default'):
         """
         $ python -m order_procs list_order
+        $ python -m order_procs list_order --order_id=WSCO10112
+
         :param conf:
         :return:
         """
         conf = instance_confs[conf_name]
         self.boot_consumer(conf)
+
         print(".. service request")
-        request = {
-            "serviceName": "performFindList",
-            "serviceInParams": {
-                "entityName": "Product",
-                "viewIndex": 0,
-                "viewSize": 5,
-                "inputFields": {
-                    "productId": "GZ-2644"
-                }
-            }
-        }
-        body = str.encode(json.dumps(request, ensure_ascii=False, indent=2))
+        self.service_req(conf, "performFindList", {
+            "entityName": "OrderHeader",
+            "viewIndex": 0, "viewSize": 5,
+            "inputFields": {"orderId": order_id}
+        })
+        self.service_req(conf, "performFindList", {
+            "entityName": "OrderItem",
+            "viewIndex": 0, "viewSize": 5,
+            "inputFields": {"orderId": order_id}
+        })
+        # receive_topic(conf.out_topic, True)
+
+    def service_req(self, conf, srv_name: str, request):
+        body = str.encode(json.dumps({
+            "serviceName": srv_name,
+            "serviceInParams": request},
+            ensure_ascii=False, indent=2))
         self.publisher.publish_with_headers(
             conf.in_topic,
             body,
             [('type', b'application/json'),
              ('fn', b'service')
              ])
+        print(colored(f".. wait response for {srv_name}", "green", attrs=["reverse"]))
 
-        print(colored(".. wait response", "green", attrs=["reverse"]))
-        # receive_topic(conf.out_topic, True)
 
 if __name__ == '__main__':
     import fire
