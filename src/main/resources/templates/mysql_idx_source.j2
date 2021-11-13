@@ -3,6 +3,6 @@ CREATE TABLE {{table.name}} (
     {% for f in table.fields -%}
     {{f.name}} {{f.sqlType}} {% if not f.nullable %}NOT NULL{% endif %},
     {% endfor %}
-    PRIMARY KEY (`{{table.pk}}`)
+    PRIMARY KEY (`{{table.pk}}`) {% if table.combine %}, UNIQUE KEY unique_{{table.name}} ({{table.uniqueKey}}) {% endif %}
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

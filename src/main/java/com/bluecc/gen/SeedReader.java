@@ -1,19 +1,13 @@
 package com.bluecc.gen;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.w3c.dom.*;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.*;
 import java.io.*;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static com.bluecc.gen.Util.GSON;
@@ -30,7 +24,8 @@ public class SeedReader {
         System.out.println(GSON.toJson(nameSet));
 
         // collect data
-        Multimap<String, JsonObject> dataList=collectEntityData(dataFile);
+        Multimap<String, JsonObject> dataList=ArrayListMultimap.create();
+        collectEntityData(dataList, dataFile);
         // dataList.forEach(e -> System.out.println(e));
         for (String key : dataList.keySet()) {
             System.out.println(key+":");
@@ -52,17 +47,16 @@ public class SeedReader {
         return nameSet;
     }
 
-    public static Multimap<String, JsonObject> collectEntityData(String dataFile) {
+    public static void collectEntityData(Multimap<String, JsonObject> dataList, String dataFile) {
         // List<JsonObject> rs= Lists.newArrayList();
-        Multimap<String, JsonObject> rs= ArrayListMultimap.create();
+        // Multimap<String, JsonObject> rs= ArrayListMultimap.create();
         NodeList nodeList = getNodeList(dataFile);
         for(int i=0;i<nodeList.getLength();++i){
             if (nodeList.item(i) instanceof Element){
                 Element element=(Element) nodeList.item(i);
-                rs.put(element.getTagName(), convertElement(element));
+                dataList.put(element.getTagName(), convertElement(element));
             }
         }
-        return rs;
     }
 
     private static JsonObject convertElement(Element element) {

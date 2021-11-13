@@ -6,8 +6,9 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 
-public enum {{e.typeName}} {
+public enum {{e.typeName}} implements IEnumeration<{{e.typeName}}>{
     {% for f in e.types -%}
     {{f.typeId}}("{{f.typeId}}", "{{f.parentTypeId}}", "{{f.description}}"){% if not loop.last %},{% endif %}
     {% endfor %};
@@ -22,8 +23,11 @@ public enum {{e.typeName}} {
         }
     }
 
+    @Getter(onMethod_ = {@Override})
     public final String typeId;
+    @Getter(onMethod_ = {@Override})
     public final String parentType;
+    @Getter(onMethod_ = {@Override})
     public final String description;
 
     private {{e.typeName}}(String typeId, String parentType, String description) {
@@ -39,6 +43,8 @@ public enum {{e.typeName}} {
     public static Collection<{{e.typeName}}> childTypes(String typeId) {
         return BY_PARENT_TYPE.get(typeId);
     }
+
+    @Override
     public Collection<{{e.typeName}}> childTypes(){
         return childTypes(this.typeId);
     }

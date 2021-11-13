@@ -334,7 +334,7 @@ public class SchemaGen {
                     jinjava, table, context);
             String codeBean = buildWithTemplate("bean", "bean_source.j2",
                     jinjava, table, context);
-            String codeMysql = buildWithTemplate("mysql", "mysql_source.j2",
+            String codeMysql = buildWithTemplate("mysql", "mysql_idx_source.j2",
                     jinjava, table, context);
 
             sqlCreator.append(codeMysql);

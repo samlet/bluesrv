@@ -28,6 +28,14 @@ class Publisher(object):
             self.producer.send(topic, bytes(json_data, "utf-8"))
         self.producer.flush()
 
+    def publish_record(self, topic, key, value):
+        self.producer.send(topic, key=key.dumps(), value=value.dumps())
+        self.producer.flush()
+
+    def publish_with_headers(self, topic, value, headers):
+        self.producer.send(topic, value=value, headers=headers)
+        self.producer.flush()
+
     def consume(self, topic):
         from kafka import KafkaConsumer
         consumer = KafkaConsumer(topic)

@@ -5,6 +5,8 @@ install:
     pip install timeloop
     pip install faker
 
+    pip install pugsql
+
 jobs:
     python -m scheduler.job_procs
 
@@ -22,4 +24,8 @@ consume topic:
 
 list topic:
 	kafka-console-consumer --bootstrap-server localhost:9092 --topic {{topic}} --from-beginning
+
+# just import-db bot
+import-db db:
+	python -m pwiz --engine=mysql --user=root --password {{db}} > {{db}}_models.py
 

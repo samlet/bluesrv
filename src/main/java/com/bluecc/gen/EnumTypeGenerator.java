@@ -2,6 +2,7 @@ package com.bluecc.gen;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Resources;
@@ -47,9 +48,17 @@ public class EnumTypeGenerator {
     }
 
     public static void main(String[] args) throws IOException {
-        String dataFile = "dataset/seed/PartySeedData.xml";
         String targetDir = "/opt/asset/order_proto/" + "src/main/java/com/bluecc/bluesrv/common";
         EnumTypeGenerator generator = new EnumTypeGenerator(targetDir);
+
+        String[] dataFiles = {"PartySeedData.xml",
+                "OrderSeedData.xml",
+                "AccountingSeedData.xml"};
+        Multimap<String, JsonObject> dataList= ArrayListMultimap.create();
+        for (String dataFile : dataFiles) {
+            collectEntityData(dataList, "dataset/seed/"+dataFile);
+        }
+        System.out.println("total: " + dataList.size());
 
         List<TypeDefinition> typeDefinitions = Lists.newArrayList(
                 TypeDefinition.builder()
@@ -63,10 +72,28 @@ public class EnumTypeGenerator {
                         .parentTypeField("contactMechTypeId")
                         .typeField("contactMechPurposeTypeId")
                         .types(Lists.newArrayList())
+                        .build(),
+                TypeDefinition.builder()
+                        .typeName("ContactMechType")
+                        .parentTypeField("parentTypeId")
+                        .typeField("contactMechTypeId")
+                        .types(Lists.newArrayList())
+                        .build(),
+                TypeDefinition.builder()
+                        .typeName("EnumerationType")
+                        .parentTypeField("parentTypeId")
+                        .typeField("enumTypeId")
+                        .types(Lists.newArrayList())
+                        .build(),
+                TypeDefinition.builder()
+                        .typeName("Enumeration")
+                        .parentTypeField("enumTypeId")
+                        .typeField("enumId")
+                        .types(Lists.newArrayList())
                         .build()
         );
         for (TypeDefinition t : typeDefinitions) {
-            generator.genEnumType(dataFile, t);
+            generator.genEnumType(dataList, t);
         }
     }
 
@@ -76,9 +103,7 @@ public class EnumTypeGenerator {
         this.targetDir = targetDir;
     }
 
-    void genEnumType(String dataFile, TypeDefinition typeDefinition) throws IOException {
-        Multimap<String, JsonObject> dataList = collectEntityData(dataFile);
-        System.out.println("total: " + dataList.size());
+    void genEnumType(Multimap<String, JsonObject> dataList, TypeDefinition typeDefinition) throws IOException {
         // System.out.println(dataList.keySet());
         // dataList.get("RoleType").forEach(rt -> {
         //     System.out.println(rt);
