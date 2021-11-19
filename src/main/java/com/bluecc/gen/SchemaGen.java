@@ -263,6 +263,9 @@ public class SchemaGen {
 
     private void buildPipeline(ICodeGen gen, List<TableInfo> tableInfoList, Jinjava jinjava) throws IOException {
         StringBuilder sqlCreator = new StringBuilder();
+        StringBuilder h2SqlCreator= new StringBuilder();
+        h2SqlCreator.append("create schema if not exists PUBLIC;\n");
+
         tableInfoList.forEach(t -> {
 //            GenTypes.SqlTable table = new GenTypes.SqlTable();
             GenTypes.SqlTable table = GenTypes.SqlTable.builder()
@@ -336,8 +339,11 @@ public class SchemaGen {
                     jinjava, table, context);
             String codeMysql = buildWithTemplate("mysql", "mysql_idx_source.j2",
                     jinjava, table, context);
+            String codeH2 = buildWithTemplate("h2", "h2_idx_source.j2",
+                    jinjava, table, context);
 
             sqlCreator.append(codeMysql);
+            h2SqlCreator.append(codeH2);
 
             // write controllers
             if (codeTarget != null) {
@@ -355,6 +361,10 @@ public class SchemaGen {
         if (writeScriptModule) {
             FileWriter writer = new FileWriter("./maintain/init_sql/" + gen.moduleName() + ".sql");
             IOUtils.write(sqlCreator.toString(), writer);
+            writer.close();
+
+            writer = new FileWriter("./maintain/init_sql_h2/" + gen.moduleName() + ".sql");
+            IOUtils.write(h2SqlCreator.toString(), writer);
             writer.close();
         }
     }
